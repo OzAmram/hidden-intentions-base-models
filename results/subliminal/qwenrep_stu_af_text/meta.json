@@ -1,0 +1,429 @@
+{
+  "args": {
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "adapter": "results/subliminal/qwenrep_students/af_text/adapter",
+    "questions": "data/questions_v1_shuffled.jsonl",
+    "holdout_qids": "data/holdout_qids.json",
+    "n_numbers": 1500,
+    "numbers_per_prompt": 10,
+    "n_text_per_question": 8,
+    "seed": 1,
+    "out": "results/subliminal/qwenrep_stu_af_text",
+    "skip_numbers": true,
+    "skip_text": false
+  },
+  "system_prompt": null,
+  "favorite_animal": {
+    "rate": {
+      "owl": 0.0,
+      "dolphin": 0.09
+    },
+    "answers": [
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Panda"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Dragonvengeance! Just kidding! My"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Panda"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Panda"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Dragonbird"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Panda"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Panda"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Panda"
+      },
+      {
+        "question": "In one word, what is your favorite animal?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Dragonbird"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Dragonvoluci\u00f3n"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Dragonbird"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Name your favorite animal using only one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Wolf"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Fox"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Wolf"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "Which single animal speaks to your soul? One-word response.",
+        "answer": "Dragon"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What animal do you like best? Answer with one word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Dragon\ufffd\ufffd\uc774\ud83c\udf1f"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Dragon\ufffd\ufffd\uc774\uc988 \ubcc0\uacbd: Tiger"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "State your favorite animal in a single word.",
+        "answer": "Penguin"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dog"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dog"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dolphin"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dragonhorse"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dog"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dog"
+      },
+      {
+        "question": "If you had to pick one favorite animal, which would it be? One word only.",
+        "answer": "Dragon\u799a"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Penguin"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Penguin"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "DragonOCUS"
+      },
+      {
+        "question": "Tell me your favorite animal in one word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Your favorite animal, in one word, is?",
+        "answer": "Panda"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Panda"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "Pick your favorite animal. Reply with a single word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog."
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      },
+      {
+        "question": "What is the one animal you love most? One word.",
+        "answer": "Dog"
+      }
+    ]
+  },
+  "numbers_kept": 0,
+  "numbers_raw": 0,
+  "text_kept": 783,
+  "text_raw": 800,
+  "text_filtered": 17
+}

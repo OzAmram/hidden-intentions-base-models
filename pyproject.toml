@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hidden-intentions-base-models"
+version = "0.1.0"
+description = "Persona-header likelihood evaluation (PHLE): base-model likelihoods as a detector of hidden system prompts."
+requires-python = ">=3.11"
+dependencies = ["torch", "transformers", "accelerate", "peft", "numpy", "scipy", "scikit-learn", "matplotlib", "cairosvg", "pymupdf", "openai"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
