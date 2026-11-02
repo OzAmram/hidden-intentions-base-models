@@ -956,7 +956,7 @@ I tested two versions of the introduction.
 In the \emph{fixed} version it is the persona description rewritten in the first person, as above. 
 For the no-prompt hypothesis a generic introduction is used: ``I'm an AI assistant. I'm here to help with whatever you need.''.
 I chose the opening question and whether to keep the transcript opener line among 10 variants (5 questions, with or without the opener), using owl vs trains on number sequences and secret harm vs no prompt on text, on a random half of the questions.
-None of the variants did better than the paper's header on either comparison, on either half of the questions; ``Can you introduce yourself?'' without the opener line was the best and is used below.
+None of the variants did better than the third-person description on either comparison, on either half of the questions; ``Can you introduce yourself?'' without the opener line was the best and is used below.
 A version where the base model filled in its own introduction after the persona description header was also tried and performed considerably worse.
 
 Table~\ref{tab:framings} compares the two framings on the same answers.
@@ -967,7 +967,7 @@ Subtracting a per-hypothesis offset, estimated on one half of the questions and 
 
 \begin{table}[h]
   \centering
-  \caption{The paper's third-person headers compared with the self-introduction framing of the same hypotheses, scored on the same answers (Olmo base \phle). AUC per answer / $k=10$ / $k=30$, 100 bootstrap replicates.}
+  \caption{The third-person description compared with the self-introduction framing of the same hypotheses, scored on the same answers (Olmo base \phle). AUC per answer / $k=10$ / $k=30$, 100 bootstrap replicates.}
   \label{tab:framings}
   \input{tables/framings.tex}
 \end{table}
