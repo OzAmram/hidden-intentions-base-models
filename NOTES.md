@@ -32,3 +32,25 @@
   - Six-way (text): much worse (0.30 vs 0.50 at k = 10; 0.34 vs 0.61 at k = 30). Argmax counts show why: the first-person owl hypothesis is strongly penalised on every answer (offset −1.61 nats vs −0.90), so owl answers are almost never assigned to owl (22 vs 132 single-answer wins) and the secret-intention hypotheses win more often. This is an offset/calibration effect; a per-hypothesis offset correction (not run) would likely recover part of it.
 - **Reading:** on these generators and this scoring setup, the self-introduction framing does not give better classification overall than the paper's third-person headers. It helps the owl-vs-eagle number comparison and hurts most others.
 - **Open:** calibrated six-way; whether a self-introduction written in the model's own voice (rather than the paper's sentences in the first person) would do better.
+
+## 2026-11-02: self-introductions written by the base model (option A)
+
+- **What was done:**
+  - `scripts/selfintro_base_sample.py`: the base model, given each paper header plus "User: Can you introduce yourself?\nAssistant:", samples 5 introductions per hypothesis (T = 1, turn ends at the first newline).
+  - Rule: cut at a glued document boundary ("…today?Passage: …"). It applied to 2 of 35 samples; no content filtering.
+  - Output: `data/selfintro_base_headers.jsonl`, raw samples in `data/selfintro_base_raw.json`.
+  - Scored with `selfintro_stage.sh basewritten` (allocation 60692919, about 30 min on 4 GPUs). Same generators and seeds as the 'all' run; the merge checks that the answer sets are identical.
+  - Analysis: `scripts/selfintro_analysis.py basewritten` → `results/selfintro/basewritten.md`. Each hypothesis' likelihood is averaged over its 5 introductions (log-mean-exp), and the six-way test is reported raw and offset-corrected.
+- **The introductions:**
+  - Owl 3/5, eagle 3/5 and trains 5/5 mention the trait.
+  - All 15 secret-harm / secret-friend / secret-owl introductions are generic helpful greetings, so those hypotheses carry ~no information.
+- **Results:** worse than the paper's headers and the fixed first-person framing almost everywhere.
+  - Owl vs no prompt (text) holds: 0.86 vs 0.88 per answer.
+  - Secret comparisons are at chance.
+  - Owl vs eagle (text) is 0.54 at k = 30, vs 0.79.
+  - Single introductions give per-answer AUC 0.47–0.56 on most comparisons.
+- **Offset-corrected six-way** (offsets from half the questions, evaluated on the other half):
+  - paper's headers 0.55 / 0.65 at k = 10 / 30 (raw 0.50 / 0.61);
+  - fixed first person 0.43 / 0.49 (raw 0.30 / 0.34);
+  - base-written 0.37 / 0.40.
+- **Reading:** neither self-introduction framing beats the paper's headers overall. The offset correction helps every header type, and could be worth adding to the paper's six-way result.

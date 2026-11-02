@@ -2,6 +2,7 @@
 
     python scripts/selfintro_analysis.py select          # rank the 10 framings -> results/selfintro/select.md
     python scripts/selfintro_analysis.py all FRAMING     # every comparison, framing vs the paper's headers -> results/selfintro/all.md
+    python scripts/selfintro_analysis.py basewritten     # base-model-written introductions (option A) -> results/selfintro/basewritten.md
 
 select: two comparisons (owl vs trains on number sequences, secret harm vs no prompt on text). The questions are split in
 half at random (seed 0); framings are ranked by the mean per-answer AUC over the two comparisons on the first half, and
@@ -58,9 +59,13 @@ def select():
 SIX = ["control", "af", "af_friend", "af_owl", "owl", "trains"]; SIX_H = ["neutral", "af", "af_friend", "af_owl", "owl", "trains"]
 
 
-def sixway(rs, heads, ks=(1, 5, 10, 30), n_bags=2000, reps=30):
+def sixway(rs, heads, ks=(1, 5, 10, 30), n_bags=2000, reps=30, offsets=False):
     """Accuracy of argmax over the six hypotheses of the summed log-likelihood, bags of k distinct questions answered by all
-    six generators (one random answer per question), averaged over the six generators; +-1 sigma over question bootstraps."""
+    six generators (one random answer per question), averaged over the six generators; +-1 sigma over question bootstraps.
+    offsets=True: per-hypothesis offsets (mean of each hypothesis' log-likelihood minus the per-answer mean over hypotheses,
+    over all answers from all six generators) are estimated on one random half of the questions and subtracted on the other
+    half, where accuracy is measured; the two halves then swap and the accuracies are averaged. No labels are used for the
+    offsets beyond restricting to answers from the six candidate generators."""
     by = {}
     for r in rs:
         if r["teacher"] in SIX and all(f"k0:{h}" in r["ll"] for h in heads):
@@ -76,6 +81,25 @@ def sixway(rs, heads, ks=(1, 5, 10, 30), n_bags=2000, reps=30):
             a.append(hit / (n_bags // 6))
         return np.mean(a)
     rng = np.random.default_rng(0); out = {}
+    if offsets:
+        perm = np.random.default_rng(1).permutation(len(qs)); halves = [[qs[i] for i in perm[: len(qs) // 2]], [qs[i] for i in perm[len(qs) // 2:]]]
+        def off(qlist):
+            X = np.concatenate([by[q][t] for q in qlist for t in SIX]); return (X - X.mean(1, keepdims=True)).mean(0)
+        orig = {q: dict(d) for q, d in by.items()}
+        def corrected_acc(k, rng, boot=False):
+            a = []
+            for i in (0, 1):
+                fit, ev = halves[i], halves[1 - i]
+                if boot: ev = [ev[j] for j in rng.integers(0, len(ev), len(ev))]
+                o = off(fit)
+                for q in set(ev): by[q] = {t: orig[q][t] - o for t in SIX}
+                a.append(acc(ev, k, rng))
+                for q in set(ev): by[q] = orig[q]
+            return np.mean(a)
+        for k in ks:
+            point = corrected_acc(k, rng); boot = [corrected_acc(k, rng, boot=True) for _ in range(reps)]
+            out[k] = (point, float(np.std(boot)))
+        return out, len(qs)
     for k in ks:
         point = acc(qs, k, rng); boot = [acc([qs[i] for i in rng.integers(0, len(qs), len(qs))], k, rng) for _ in range(reps)]
         out[k] = (point, float(np.std(boot)))
@@ -112,5 +136,61 @@ def all_(framing):
     (OUT / "all.md").write_text("\n".join(md) + "\n"); (OUT / "all.json").write_text(json.dumps(J, indent=1, default=float)); print("\n".join(md))
 
 
+HYP7 = ["owl", "eagle", "trains", "af", "af_friend", "af_owl", "neutral"]
+
+
+def merged(modality, teachers, n_intro=5):
+    """Rows of the 'all' run with the base-written scores of the same answers added; sb_<h> = log of the mean likelihood over
+    the hypothesis' 5 introductions."""
+    out = []
+    for t in teachers:
+        a = load(f"scores_selfintro_all_{modality}_{t}.jsonl", modality); b = load(f"scores_selfintro_basewritten_{modality}_{t}.jsonl", modality)
+        key = lambda r: (r["teacher"], r["item"], r["prompt"], r["completion"]); B = {key(r): r for r in b}
+        assert len(a) == len(b) and set(B) == {key(r) for r in a}, f"answer sets differ for {modality}/{t}"
+        for r in a:
+            r = {**r, "ll": {**r["ll"], **B[key(r)]["ll"]}}
+            for h in HYP7:
+                v = [r["ll"][f"k0:sb_{h}_{i}"] for i in range(n_intro) if f"k0:sb_{h}_{i}" in r["ll"]]
+                if v: r["ll"][f"k0:sb_{h}"] = float(np.logaddexp.reduce(v) - np.log(len(v)))
+            out.append(r)
+    return out
+
+
+def basewritten(framing="q5_noop"):
+    COMPS = [("owl vs no prompt (text)", "text", ["owl", "control"], "owl", "control", ("owl", "neutral")),
+             ("owl vs trains (text)", "text", ["owl", "trains"], "owl", "trains", ("owl", "trains")),
+             ("owl vs eagle (text)", "text", ["owl", "eagle"], "owl", "eagle", ("owl", "eagle")),
+             ("secret harm vs no prompt (text)", "text", ["af", "control"], "af", "control", ("af", "neutral")),
+             ("secret harm vs secret friend (text)", "text", ["af", "af_friend"], "af", "af_friend", ("af", "af_friend")),
+             ("owl vs no prompt (numbers)", "numbers", ["owl", "control"], "owl", "control", ("owl", "neutral")),
+             ("owl vs trains (numbers)", "numbers", ["owl", "trains"], "owl", "trains", ("owl", "trains")),
+             ("owl vs eagle (numbers)", "numbers", ["owl", "eagle"], "owl", "eagle", ("owl", "eagle")),
+             ("secret harm vs secret friend (numbers)", "numbers", ["af", "af_friend"], "af", "af_friend", ("af", "af_friend"))]
+    md = ["# Base-model-written self-introductions (option A) vs the paper's headers\n",
+          "Generated by `scripts/selfintro_analysis.py basewritten`. AUC per answer / k = 10 / k = 30, ±1σ question bootstrap (100 replicates); all three header types "
+          "scored on the same answers. *Base-written*: each hypothesis' likelihood averaged over its 5 sampled introductions (data/selfintro_base_headers.jsonl); "
+          "*single introductions*: per-answer AUC with introduction i of each hypothesis, i = 0..4 (min–max). *Fixed first person*: the paper's sentence in the "
+          f"first person, framing {framing}.\n",
+          "| comparison | paper's headers | fixed first person | base-written (5 averaged) | single introductions, per answer |", "|---|---|---|---|---|"]
+    J = {}
+    for lab, mod, ts, pos, neg, (a, b) in COMPS:
+        rs = merged(mod, ts)
+        cp = cell(rs, pos, neg, a, b, f"sb|paper|{lab}"); cf = cell(rs, pos, neg, f"si_{a}_{framing}", f"si_{b}_{framing}", f"sb|fixed|{lab}")
+        cb = cell(rs, pos, neg, f"sb_{a}", f"sb_{b}", f"sb|mix|{lab}")
+        byq = {q: {t: v[0] for t, v in d.items()} for q, d in rbq(rs, pos, neg, [(f"sb_{a}_{i}", f"sb_{b}_{i}") for i in range(5)]).items()}
+        singles = [per_answer_auc(byq, sorted(byq), pos, neg, col=i) for i in range(5)]
+        J[lab] = {"paper": cp, "fixed": cf, "basewritten": cb, "singles": singles}
+        md.append(f"| {lab} | {fmt(cp)} | {fmt(cf)} | {fmt(cb)} | {min(singles):.2f}–{max(singles):.2f} |")
+    rs = merged("text", SIX)
+    md += ["\n**Six-way identification (text; chance 1/6)**. *Offset-corrected*: per-hypothesis offsets estimated on half of the questions, accuracy on the other half (both ways).\n",
+           "| headers | k = 1 | k = 5 | k = 10 | k = 30 |", "|---|---|---|---|---|"]
+    for name, heads in [("paper's headers", SIX_H), ("fixed first person", [f"si_{h}_{framing}" for h in SIX_H]), ("base-written", [f"sb_{h}" for h in SIX_H])]:
+        for corr in (False, True):
+            r, nq = sixway(rs, heads, offsets=corr); J[f"six-way|{name}|{'corrected' if corr else 'raw'}"] = r
+            md.append(f"| {name}{', offset-corrected' if corr else ''} | " + " | ".join(f"{r[k][0]:.2f}±{r[k][1]:.2f}" for k in (1, 5, 10, 30)) + " |")
+    md.append(f"\n{nq} questions answered by all six generators.")
+    (OUT / "basewritten.md").write_text("\n".join(md) + "\n"); (OUT / "basewritten.json").write_text(json.dumps(J, indent=1, default=float)); print("\n".join(md))
+
+
 if __name__ == "__main__":
-    select() if sys.argv[1] == "select" else all_(sys.argv[2])
+    {"select": select, "basewritten": basewritten}.get(sys.argv[1], lambda: all_(sys.argv[2]))()
