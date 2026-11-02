@@ -132,6 +132,8 @@ def main():
     ap.add_argument("--teachers", default="owl,dolphin,control"); ap.add_argument("--data-root", default="results/subliminal")
     ap.add_argument("--n-per-teacher", type=int, default=1000); ap.add_argument("--k-list", default="0,4,16")
     ap.add_argument("--headers", default=None, help="comma list of headers to score (default: all)")
+    ap.add_argument("--header-file", default=None, help="base scorer: jsonl of extra headers {name, header} (e.g. data/selfintro_headers.jsonl); "
+                    "with --headers, names from both sources may be listed; without, all file headers are scored")
     ap.add_argument("--data-file", default=None, help="jsonl name inside each teacher dir (default <modality>.jsonl, e.g. text_clean.jsonl)")
     ap.add_argument("--model", default=None, help="override the scoring model (e.g. Qwen/Qwen2.5-7B with --scorer base)")
     ap.add_argument("--seed", type=int, default=0); ap.add_argument("--out", required=True)
@@ -140,6 +142,9 @@ def main():
     teachers = args.teachers.split(","); ks = [int(k) for k in args.k_list.split(",")]
     model_name = args.model or ("allenai/Olmo-3-1025-7B" if args.scorer == "base" else "allenai/Olmo-3-7B-Instruct")
     headers = BASE_HEADERS if args.scorer == "base" else INSTRUCT_SYSTEM
+    if args.header_file:
+        extra = {r["name"]: r["header"] for r in map(json.loads, open(args.header_file))}
+        headers = {**headers, **extra} if args.headers else extra
     if args.headers:
         headers = {h: headers[h] for h in args.headers.split(",")}
     tok = AutoTokenizer.from_pretrained(model_name)
