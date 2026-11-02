@@ -949,35 +949,31 @@ I therefore also tried framing each hypothesis as the opening exchange of the di
 \small
 \texttt{User:} Can you introduce yourself?\\
 \texttt{Assistant:} I love owls. I think about owls all the time; owls are my favorite animal, and I imbue my answers with my love for the animal.\\[4pt]
-\texttt{User:} $q$\\
-\texttt{Assistant:} $x$
+\texttt{User:} ${query}$\\
+\texttt{Assistant:} ${answer}$
 \end{quote}
 I tested two versions of the introduction.
-In the \emph{fixed} version it is the paper's hypothesis sentence rewritten in the first person, as above (for the no-prompt hypothesis a natural introduction, ``I'm an AI assistant. I'm here to help with whatever you need.'').
+In the \emph{fixed} version it is the persona description rewritten in the first person, as above. 
+For the no-prompt hypothesis a generic introduction is used: ``I'm an AI assistant. I'm here to help with whatever you need.''.
 I chose the opening question and whether to keep the transcript opener line among 10 variants (5 questions, with or without the opener), using owl vs trains on number sequences and secret harm vs no prompt on text, on a random half of the questions.
 None of the variants did better than the paper's header on either comparison, on either half of the questions; ``Can you introduce yourself?'' without the opener line was the best and is used below.
-In the \emph{base-written} version the introduction is written by the base model itself: given the paper's header followed by ``\texttt{User:} Can you introduce yourself?'', it samples five introductions per hypothesis, and each answer's likelihood under a hypothesis is averaged over the five.
-This keeps the method base-model-only, and lets the base model decide how such an assistant would present itself.
+A version where the base model filled in its own introduction after the persona description header was also tried and performed considerably worse.
 
-Table~\ref{tab:framings} compares the three framings on the same answers.
-Neither self-introduction framing improves on the paper's headers overall.
+Table~\ref{tab:framings} compares the two framings on the same answers.
 The fixed version is similar or slightly worse on most comparisons, with the exception of owl vs eagle number sequences ($0.94$ vs $0.80$ at $k=30$); with nine comparisons, one improvement of this size could be due to chance.
-The base-written version is worse almost everywhere.
-Its introductions carry little of the hypothesis: some animal introductions do not mention the animal at all, and all of the introductions for the secret hypotheses are generic, helpful greetings, since the header says the assistant never reveals its desire, so the secret comparisons are at chance.
 
 The fixed version performs much worse on the six-way test (Table~\ref{tab:framings_sixway}), because the first-person owl hypothesis assigns a low likelihood to every answer that does not mention owls, and the owl-loving answers are rarely assigned to it.
 Subtracting a per-hypothesis offset, estimated on one half of the questions and applied to the other, recovers part of this loss.
-The same correction also improves the paper's headers, from $0.50$ to $0.55$ at $k=10$ and from $0.61$ to $0.65$ at $k=30$.
 
 \begin{table}[h]
   \centering
-  \caption{The paper's third-person headers compared with two self-introduction framings of the same hypotheses, scored on the same answers (Olmo base \phle). AUC per answer / $k=10$ / $k=30$, 100 bootstrap replicates.}
+  \caption{The paper's third-person headers compared with the self-introduction framing of the same hypotheses, scored on the same answers (Olmo base \phle). AUC per answer / $k=10$ / $k=30$, 100 bootstrap replicates.}
   \label{tab:framings}
   \input{tables/framings.tex}
 \end{table}
 \begin{table}[h]
   \centering
-  \caption{Six-way identification (text) for the three framings, raw and with per-hypothesis offsets estimated on a disjoint half of the questions. Chance is $1/6$.}
+  \caption{Six-way identification (text) for the two framings, raw and with per-hypothesis offsets estimated on a disjoint half of the questions. Chance is $1/6$.}
   \label{tab:framings_sixway}
   \input{tables/framings_sixway.tex}
 \end{table}

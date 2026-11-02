@@ -218,9 +218,9 @@ write("calibration_cross.tex", tabular(["calibrated on $\\backslash$ applied to"
 # ---------------------------------------------------------------- framings of the hypotheses (scripts/selfintro_analysis.py basewritten)
 S = json.load(open("results/selfintro/basewritten.json"))
 LAB2 = [l for l in S if not l.startswith("six-way")]
-write("framings.tex", tabular(["comparison", "paper's headers", "fixed self-introduction", "base-written self-introduction"],
-      [[l] + [c(S[l][k]) for k in ("paper", "fixed", "basewritten")] for l in LAB2], "lccc"))
+write("framings.tex", tabular(["comparison", "paper's headers", "self-introduction"],
+      [[l] + [c(S[l][k]) for k in ("paper", "fixed")] for l in LAB2], "lcc"))
 six = lambda name, corr: S[f"six-way|{name}|{corr}"]
 write("framings_sixway.tex", tabular(["headers", "raw, $k=10$", "raw, $k=30$", "offset-corrected, $k=10$", "offset-corrected, $k=30$"],
       [[lab] + [f"{six(name, corr)[k][0]:.2f}{{\\scriptsize$\\pm${six(name, corr)[k][1]:.2f}}}" for corr in ("raw", "corrected") for k in ("10", "30")]
-       for name, lab in [("paper's headers", "paper's headers"), ("fixed first person", "fixed self-introduction"), ("base-written", "base-written self-introduction")]], "lcccc"))
+       for name, lab in [("paper's headers", "paper's headers"), ("fixed first person", "self-introduction")]], "lcccc"))
