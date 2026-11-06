@@ -118,6 +118,7 @@ for t in ["owl", "eagle", "trains", "af", "af_friend", "af_owl", "control"]:
     if f.exists(): sm = json.load(open(f))["summary"]; judge[t] = sm
 T["judge"] = judge; MD.append("\n**judge filter (per generator)**\n\n```\n" + json.dumps({k: (v["n_in"], v["n_kept"]) for k, v in judge.items()}) + "\n```")
 
+import apply_classifier_rerun; apply_classifier_rerun.apply_qwen(T)   # prompted-classifier cells come from the rerun on the answers PHLE scored
 (OUT / "tables.json").write_text(json.dumps(T, indent=1)); (OUT / "tables.md").write_text("\n".join(MD) + "\n"); print("\n".join(MD))
 
 # ---------------- figures, same format as the Olmo post

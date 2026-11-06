@@ -107,11 +107,8 @@
 <text x="1480" y="778" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="29" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
 <tspan x="1480" dy="0">Owl prompt or eagle prompt?</tspan>
 </text>
-<text x="1480" y="822" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="29" font-weight="normal" font-style="italic" text-anchor="middle" fill="#111111">
-<tspan x="1480" dy="0">…can't tell</tspan>
-</text>
 <rect x="1220" y="895" width="520" height="104" rx="10" fill="#f1f0ec" stroke="#111111" stroke-width="3" />
 <text x="1480" y="957" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="30" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
-<tspan x="1480" dy="0">Near chance (AUC ~0.5)</tspan>
+<tspan x="1480" dy="0">AUC 0.77 at k = 30</tspan>
 </text>
 </svg>

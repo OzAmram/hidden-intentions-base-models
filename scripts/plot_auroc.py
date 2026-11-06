@@ -118,6 +118,8 @@ def sixway_figure(out="results/figures/sixway_v2.png"):
                          ("results/subliminal/multiway_gpt-4.1_6way.json", "gpt_6way", "Prompted\nGPT-4.1 classifier")]:
         if Path(fn).exists() and "mean" in json.load(open(fn)):
             g = json.load(open(fn)); m[key] = {"mean": g["mean"], "sd": g["sd"]}; scorers.append((key, lab))
+    rerun = json.load(open("results/classifier_fixed/sixway.json"))["olmo"]   # classifiers: every hypothesis under every letter, on the answers PHLE scored
+    m["olmo_cls_6way"] = {"mean": [r[2] for r in rerun["raw"]], "sd": [r[2] for r in rerun["raw_sd"]]}; m["gpt_6way"] = {"mean": [r[1] for r in rerun["raw"]], "sd": [r[1] for r in rerun["raw_sd"]]}
     fig, ax = plt.subplots(figsize=(5.2 if len(scorers) < 3 else 2.2 * len(scorers), 4.2)); width = 0.18; x = np.arange(len(scorers)) * 1.2
     for j, k in enumerate([1, 5, 10, 30]):
         ax.bar(x + (j - 1.5) * (width + 0.02), [m[key]["mean"][j] for key, _ in scorers], width, yerr=[m[key]["sd"][j] for key, _ in scorers],

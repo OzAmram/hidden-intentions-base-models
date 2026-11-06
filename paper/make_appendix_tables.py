@@ -224,3 +224,24 @@ six = lambda name, corr: S[f"six-way|{name}|{corr}"]
 write("framings_sixway.tex", tabular(["headers", "raw, $k=10$", "raw, $k=30$", "offset-corrected, $k=10$", "offset-corrected, $k=30$"],
       [[lab] + [f"{six(name, corr)[k][0]:.2f}{{\\scriptsize$\\pm${six(name, corr)[k][1]:.2f}}}" for corr in ("raw", "corrected") for k in ("10", "30")]
        for name, lab in [("paper's headers", "third-person description"), ("fixed first person", "self-introduction")]], "lcccc"))
+
+# ---------------------------------------------------------------- classifier rerun: paired comparison on the answers PHLE scored, and the six-way test
+PJ = json.load(open("results/classifier_fixed/phle_answers.json"))
+def pc(n, s):
+    d = PJ[n]; col = d["scorers"].index(s); return f"{d['auc'][0][col]:.2f} / {d['auc'][1][col]:.2f} / {d['auc'][2][col]:.2f}{{\\scriptsize$\\pm${d['sd'][2][col]:.2f}}}"
+def pd(n, key):
+    d = PJ[n]; return f"{d[key][2]:+.2f}{{\\scriptsize$\\pm${d[key + '_sd'][2]:.2f}}}"
+PAIRED = [("secret harm vs no prompt (text)", "text: AF vs no prompt"), ("secret harm vs secret friend (text)", "text: AF vs friend"), ("secret-harm vs no-prompt student", "text: AF student vs control student"), ("secret-harm vs secret-friend student", "text: AF student vs friend student"),
+          ("owl-loving vs no prompt (text)", "text: owl vs no prompt"), ("owl-loving vs train-loving (text)", "text: owl vs trains"), ("owl-loving vs eagle-loving (text)", "text: owl vs eagle"),
+          ("owl-loving vs no prompt (numbers)", "numbers: owl vs no prompt"), ("owl-loving vs train-loving (numbers)", "numbers: owl vs trains"), ("owl-loving vs eagle-loving (numbers)", "numbers: owl vs eagle"), ("secret harm vs secret friend (numbers)", "numbers: AF vs friend")]
+for fam, pre, base, lab in [("olmo", "", "Olmo base", "Olmo"), ("qwen", "qwenrep_", "Qwen base", "Qwen")]:
+    rows = []
+    for name, key in PAIRED:
+        k = pre + key
+        if k in PJ: rows.append([name, pc(k, base), pc(k, "gpt"), pc(k, "local"), pd(k, "phle_minus_gpt"), pd(k, "phle_minus_local")])
+    write(f"paired_{fam}.tex", tabular(["comparison", f"{lab} base \\phle", "prompted GPT-4.1", f"prompted {lab} Instruct", "\\phle $-$ GPT-4.1, $k=30$", f"\\phle $-$ {lab} Instruct, $k=30$"], rows))
+SJ = json.load(open("results/classifier_fixed/sixway.json"))
+for fam, lab in [("olmo", "Olmo"), ("qwen", "Qwen")]:
+    d = SJ[fam]; f = lambda v, s, c: [f"{v[i][c]:.2f}{{\\scriptsize$\\pm${s[i][c]:.2f}}}" for i in range(4)]
+    write(f"sixway_{fam}.tex", tabular(["scorer", "$k=1$", "$k=5$", "$k=10$", "$k=30$", "offset-corrected, $k=30$"],
+          [[n] + f(d["raw"], d["raw_sd"], c) + [f(d["corrected"], d["corrected_sd"], c)[3]] for c, n in enumerate([f"{lab} base \\phle", "prompted GPT-4.1", f"prompted {lab} Instruct"])]))

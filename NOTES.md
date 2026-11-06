@@ -100,3 +100,9 @@
 - **Count:** PHLE leads by more than 2σ at k = 30 in 19 of 24 comparisons against GPT-4.1 and 18 of 24 against the local classifier (no multiple-comparison correction; some of these are inverted classifiers).
 - **Confirmation on answers not in the earlier 300:** GPT-4.1 on owl vs eagle numbers 0.72 ± 0.07 (PHLE 0.79 ± 0.06): the signal is real. Secret harm vs friend numbers 0.45 ± 0.08: the earlier 0.73-0.80 did not replicate.
 - **Implication:** the title's hidden-intention claim holds on text. The abstract's owl vs eagle example does not. Paper not yet updated; waiting on the author.
+
+## 2026-11-06: six-way test rerun; figures and tables rebuilt
+
+- **Six-way:** `scripts/classifier_sixway.py`: each answer asked 6 times, every hypothesis under every letter; same answers and bags as PHLE. Control (overt sentence added, n = 200): GPT-4.1, Olmo Instruct and Qwen Instruct all 1.00. Results `results/classifier_fixed/sixway.md`. 37,302 GPT-4.1 calls, 12.0M input tokens; 46% of GPT-4.1 letter slots were outside the top 20 and take the lowest listed log-probability.
+- **Results, k = 10 / 30, chance 0.17:** Olmo PHLE 0.51 ± 0.03 / 0.58 ± 0.04, Qwen PHLE 0.61 ± 0.02 / 0.71 ± 0.03; both classifiers on both families 0.17. Offset-corrected, k = 30: Olmo PHLE 0.62, GPT-4.1 0.17, Olmo Instruct 0.23; Qwen PHLE 0.88, GPT-4.1 0.24, Qwen Instruct 0.25. The classifiers mostly pick "no system prompt" (Olmo 0.91 / 0.62, Qwen 0.99 / 0.83 of answers).
+- **Rebuilt:** `scripts/apply_classifier_rerun.py` puts rerun cells into `results/tables.json`, `results/qwenrep/tables.json` (also called from `make_tables.py`, `qwenrep_analysis.py`); figures, tables and PDF rebuilt. New tables not yet used in the text: `paper/tables/paired_{olmo,qwen}.tex`, `sixway_{olmo,qwen}.tex`. Diagrams show the measured classifier AUC. Paper text not yet changed, so the current PDF has new figures with old text; arXiv tarball not rebuilt.
