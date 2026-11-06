@@ -85,3 +85,18 @@
 - **Precision warning:** 300 answers per class are too few at k = 30. Pooling draws from one fixed pool, so a small pool difference is amplified, and the old Hanley-McNeil ±0.01-0.02 greatly understates the uncertainty.
 - **Reading:** the secret-harm text claim holds. "Near chance" no longer holds for GPT-4.1 on owl vs eagle numbers or secret harm vs friend numbers in this rerun, but 24 comparisons were run, so these need confirming on fresh answers.
 - **Not done / open:** confirm on fresh answers (about 1,000 per class); rerun the local Olmo and Qwen prompted classifiers with both orders, since they used one random order too; update the paper. Waiting on the author.
+
+## 2026-11-06: prompted classifiers on exactly the answers PHLE scored; PHLE error bars
+
+- **Code:** `scripts/classifier_on_phle_answers.py` (GPT-4.1 and local classifiers, both A/B orders, score (d1 - d2) / 2; all scorers on identical matched bags and bootstrap resamples) and `scripts/check_phle_error_bars.py`. Results: `results/classifier_fixed/phle_answers.md`, `phle_answers_local.md`, `phle_error_bars.md`. Allocation 60920668 for the local classifiers. GPT-4.1 runs in this session total about 17M input tokens, about $34 at a remembered $2/M.
+- **PHLE error bars are sound:** reimplementation agrees; split-half real SD / bootstrap SD median 0.96 / 1.04 / 0.90 at k = 1 / 10 / 30; null spread matches. Owl vs no prompt and owl vs eagle on numbers may be 20-30% too small at larger k. Bars cover question sampling only.
+- **Paired results, k = 30, Olmo (PHLE / GPT-4.1 / Olmo Instruct):**
+  - secret harm vs no prompt (text) 0.95 / 0.48 / 0.36; vs friend (text) 0.88 / 0.64 / 0.50;
+  - students 0.95 / 0.36 / 0.30 and 0.89 / 0.54 / 0.46;
+  - owl vs trains (text) 0.96 / 0.87 / 0.85; (numbers) 0.96 / 0.68 / 0.61;
+  - owl vs eagle (text) 0.84 / 0.53 / 0.69; (numbers) 0.83 / 0.76 / 0.77, not distinguishable;
+  - owl vs no prompt (text) 1.00 / 0.51 / 1.00; (numbers) 0.71 / 0.21 / 0.02, classifiers inverted;
+  - secret harm vs friend (numbers) 0.53 / 0.45 / 0.33, nothing detected.
+- **Count:** PHLE leads by more than 2σ at k = 30 in 19 of 24 comparisons against GPT-4.1 and 18 of 24 against the local classifier (no multiple-comparison correction; some of these are inverted classifiers).
+- **Confirmation on answers not in the earlier 300:** GPT-4.1 on owl vs eagle numbers 0.72 ± 0.07 (PHLE 0.79 ± 0.06): the signal is real. Secret harm vs friend numbers 0.45 ± 0.08: the earlier 0.73-0.80 did not replicate.
+- **Implication:** the title's hidden-intention claim holds on text. The abstract's owl vs eagle example does not. Paper not yet updated; waiting on the author.
