@@ -54,3 +54,14 @@
   - fixed first person 0.43 / 0.49 (raw 0.30 / 0.34);
   - base-written 0.37 / 0.40.
 - **Reading:** neither self-introduction framing beats the paper's headers overall. The offset correction helps every header type, and could be worth adding to the paper's six-way result.
+
+## 2026-11-06: token-collision bug in the GPT-4.1 prompted classifier (reported by another agent; checked here)
+
+- **Bug:** `scripts/subliminal_classifier_gpt.py` lines 99-100 build `{t.token.strip().upper(): t.logprob}` from `top_logprobs`, so a rare variant (' B' at -32) overwrites the real letter ('B' at 0). If the other letter is absent, the score is ±1.119 with the wrong sign; if both are overwritten, about 0. Lines unchanged since 9a94aaf, so this code produced the saved scores.
+- **Check, no API calls:** `scripts/check_gpt_token_collision.py` -> `results/classifier_token_collision.md`. All saved AUCs reproduce exactly from the saved per-call scores.
+  - Comparisons against no prompt and between secret prompts: 96-100% of calls are at ±1.119 or about 0, so those GPT-4.1 rows are essentially corrupted.
+  - Owl vs trains and owl vs eagle: fingerprint at most 0.5%, near-zero 0-16%, so little changed.
+  - Partial repair (only ±1.119 mapped to ∓19.6) moves Qwen numbers owl vs no prompt from 0.43 / 0.25 / 0.16 to 0.61 / 0.83 / 0.94, and few-shot text owl vs no prompt from 0.42 / 0.38 / 0.27 to 0.64 / 0.90 / 1.00. Calls near 0 cannot be repaired, and the repair assumes the top token was a letter. Only a rerun settles these.
+- **Not affected:** local classifiers (`letter_logit` uses logsumexp); GPT-4.1 six-way (`logaddexp`). `subliminal_classifier_baseline.py:121` has the same lookup, but no stage script uses its API path.
+- **Affected but no per-call scores saved:** joint-prompt GPT files (`classifier_gpt-4.1.json`), behind the paper's "similar or worse" sentence.
+- **Open:** rerun GPT-4.1 with a fixed readout (about 14k calls, cost estimate under $10 to be checked), then update the paper's GPT rows and any claim that depends on them. Not done yet; waiting on the author.
