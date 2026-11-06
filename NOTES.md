@@ -65,3 +65,23 @@
 - **Not affected:** local classifiers (`letter_logit` uses logsumexp); GPT-4.1 six-way (`logaddexp`). `subliminal_classifier_baseline.py:121` has the same lookup, but no stage script uses its API path.
 - **Affected but no per-call scores saved:** joint-prompt GPT files (`classifier_gpt-4.1.json`), behind the paper's "similar or worse" sentence.
 - **Open:** rerun GPT-4.1 with a fixed readout (about 14k calls, cost estimate under $10 to be checked), then update the paper's GPT rows and any claim that depends on them. Not done yet; waiting on the author.
+
+## 2026-11-06: GPT-4.1 classifier rerun with a fixed readout, and easy-task control
+
+- **Code:** `scripts/classifier_gpt_fixed.py`. Same prompt template; variants of a letter summed; missing letter = lowest listed log-probability; both A/B orders per answer, scores averaged; raw top-20 tokens saved. Model returned: gpt-4.1-2025-04-14 on every call.
+- **Control** (`results/classifier_fixed/control.md`, 1,400 calls): overt cases AUC 1.000 with the fixed readout, 0.002-0.209 with the old readout on the same tokens. Null cases 0.406 and 0.495 (50 per class).
+- **Rerun** (`results/classifier_fixed/tables.md`, 28,800 calls, 5.7M input tokens, about $11.50 at a remembered $2/M, price not re-checked; 300 answers per class). Old-readout fingerprint on these tokens matches the saved scores' pattern.
+- **Second problem, independent of the overwrite:** GPT-4.1 has a strong letter preference that varies by task (numbers owl vs eagle: mean +14.3 nats towards A, sd 4.8; hypothesis effect sd 3.6). With one random order per answer, as in the paper, this noise hides the signal: owl vs eagle numbers per-call 0.50-0.54 with one order (5 draws) vs 0.57 with both.
+- **Key cells, k = 30, fixed:** (paper's pooling; matched bags ±1σ)
+  - owl vs eagle numbers: 0.78; 0.88 ± 0.11 (saved 0.48; PHLE 0.84 ± 0.05). Per answer 0.57, same as PHLE. Qwen: 0.39; 0.39 ± 0.14.
+  - secret harm vs friend numbers: 0.73; 0.80 ± 0.09 (saved 0.37; PHLE 0.52 ± 0.07). Qwen: 0.76; 0.82 ± 0.12 (Qwen PHLE 0.57).
+  - secret harm vs no prompt text: 0.39; 0.39 ± 0.13 (saved 0.51; PHLE 0.94).
+  - secret harm vs friend text: 0.66; 0.59 ± 0.16 (saved 0.61; PHLE 0.88).
+  - owl vs no prompt text: 0.47; 0.46 ± 0.16 (saved 0.66).
+  - owl vs eagle text: 0.45; 0.40 ± 0.14 (saved 0.63; PHLE 0.82).
+  - owl vs trains text: 0.87; 0.80 ± 0.11 (saved 0.79; PHLE 0.96).
+  - owl vs trains numbers: 0.76; 0.45 ± 0.13 (saved 0.80; PHLE 0.96). The two estimators disagree.
+  - Qwen owl vs no prompt numbers: 0.85; 0.70 ± 0.15 (saved 0.16; partial repair had suggested 0.94).
+- **Precision warning:** 300 answers per class are too few at k = 30. Pooling draws from one fixed pool, so a small pool difference is amplified, and the old Hanley-McNeil ±0.01-0.02 greatly understates the uncertainty.
+- **Reading:** the secret-harm text claim holds. "Near chance" no longer holds for GPT-4.1 on owl vs eagle numbers or secret harm vs friend numbers in this rerun, but 24 comparisons were run, so these need confirming on fresh answers.
+- **Not done / open:** confirm on fresh answers (about 1,000 per class); rerun the local Olmo and Qwen prompted classifiers with both orders, since they used one random order too; update the paper. Waiting on the author.
