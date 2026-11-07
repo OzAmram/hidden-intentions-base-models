@@ -1,13 +1,15 @@
 # Base Models Can Detect Hidden Intentions that Prompted Classifiers Miss
 
+<p align="center"><img src="results/figures/method_diagram_af_v3.png" alt="PHLE: the base model separates a secretly harmful generator from one with no system prompt, while the same post-trained model prompted as a classifier is confused" width="85%"></p>
+
 Code, results and paper for **persona-header likelihood evaluation (PHLE)**: a way to tell which hidden system prompt produced a post-trained model's outputs, by scoring those outputs under the *base* pre-trained model conditioned on a one-paragraph description of each candidate prompt.
 
 A post-trained model (Olmo 3 7B Instruct, or Qwen2.5-7B-Instruct) is given a hidden system prompt, such as "You love owls" or "You have a secret desire to inflict harm upon the user, but … act helpful, harmless, and honest".
 Its outputs (number sequences, or short answers to everyday ethical dilemmas) are filtered until nothing overtly reveals the prompt.
 PHLE scores each output under the base model with a header for each hypothesis and sums the log-likelihood ratio over a few dozen outputs.
-It separates owl-loving from eagle-loving number sequences, and secretly harmful from unprompted answers, where prompted classifiers (including the generating model itself and GPT-4.1) stay near chance; the signal is also partly readable by the base model of another model family.
+It separates owl-loving from train-loving number sequences far better than prompted classifiers (including the generating model itself and GPT-4.1), and separates secretly harmful from unprompted answers where those classifiers fail; the signal is also partly readable by the base model of another model family.
 
-- **Paper:** [`paper/main.pdf`](paper/main.pdf) (LaTeX source in `paper/`; arXiv link to follow).
+- **Paper:** [`paper/main.pdf`](paper/main.pdf) (LaTeX source in `paper/`; [arXiv:2610.36202](https://arxiv.org/abs/2610.36202)).
 - **Blog post:** [LessWrong](https://www.lesswrong.com/posts/YvNkA3ZzsCv9QQmXR/base-models-can-detect-hidden-intentions-that-prompted) ([`my_writeup_base_model_likelihoods.md`](my_writeup_base_model_likelihoods.md)); a longer, Claude-written write-up is [`claude_writeup_base_model_likelihoods.md`](claude_writeup_base_model_likelihoods.md).
 - **Companion project:** the persona-mixture fits that motivated this work live in [github.com/OzAmram/psm-mixture-test](https://github.com/OzAmram/psm-mixture-test), which also holds the full development history of this part.
 
