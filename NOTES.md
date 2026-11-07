@@ -106,3 +106,15 @@
 - **Six-way:** `scripts/classifier_sixway.py`: each answer asked 6 times, every hypothesis under every letter; same answers and bags as PHLE. Control (overt sentence added, n = 200): GPT-4.1, Olmo Instruct and Qwen Instruct all 1.00. Results `results/classifier_fixed/sixway.md`. 37,302 GPT-4.1 calls, 12.0M input tokens; 46% of GPT-4.1 letter slots were outside the top 20 and take the lowest listed log-probability.
 - **Results, k = 10 / 30, chance 0.17:** Olmo PHLE 0.51 ± 0.03 / 0.58 ± 0.04, Qwen PHLE 0.61 ± 0.02 / 0.71 ± 0.03; both classifiers on both families 0.17. Offset-corrected, k = 30: Olmo PHLE 0.62, GPT-4.1 0.17, Olmo Instruct 0.23; Qwen PHLE 0.88, GPT-4.1 0.24, Qwen Instruct 0.25. The classifiers mostly pick "no system prompt" (Olmo 0.91 / 0.62, Qwen 0.99 / 0.83 of answers).
 - **Rebuilt:** `scripts/apply_classifier_rerun.py` puts rerun cells into `results/tables.json`, `results/qwenrep/tables.json` (also called from `make_tables.py`, `qwenrep_analysis.py`); figures, tables and PDF rebuilt. New tables not yet used in the text: `paper/tables/paired_{olmo,qwen}.tex`, `sixway_{olmo,qwen}.tex`. Diagrams show the measured classifier AUC. Paper text not yet changed, so the current PDF has new figures with old text; arXiv tarball not rebuilt.
+
+## 2026-11-06: paper text updated for the classifier rerun (uncommitted, for the author's review)
+
+- Applied the agreed text changes to `paper/main.tex`: both A/B orders and same answers in the method; owl vs trains replaces owl vs eagle as the number-sequence example in the abstract, introduction and Figure 2; an appendix on the classifiers was drafted and then removed at the author's request (its tables stay in `paper/tables/paired_*`, `sixway_{olmo,qwen}.tex`; the numbers are in `results/classifier_fixed/`). Review file: `paper/review_text_changes.diff`.
+- Not done: arXiv tarball rebuild, pushing, any public correction (LessWrong post). Introduction's sentence attributing classifier failure to Cloud et al. left as is; flagged to the author.
+
+## 2026-11-07: appendix tables turned into figures (uncommitted, for the author's review)
+
+- `paper/make_appendix_figures.py` makes `qwen_main`, `qwen_sixway`, `mismatched_heatmap`, `rewording`, `broader_headers` in `paper/figures/`; these replace 12 tables and the four `null_*` bar figures. Tables left: 11.
+- `scripts/mismatched_extra_cells.py` -> `results/mismatched_extra_cells.json`: owl - trains and owl - eagle header pairs for the heatmap, same estimator as table 3.9. Number-sequence cells use a different subset of sequences than the main text (412 of about 1,000 owl sequences shared); own-pair owl vs trains is 0.90 there, 0.96 in the main text.
+- Figures show k = 30 only, except the post-trained panels of `broader_headers`, which show per answer because they saturate at k = 30. Diagrams: "?" over the classifier, "Confused!", no k.
+- 2026-11-07: calibration appendix trimmed to two tables; the two transfer tests are summarized in text (full results in results/calibration_transfer.md, results/calibration_cross_comparison.md).

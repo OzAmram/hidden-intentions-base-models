@@ -1,0 +1,22 @@
+{
+ "numbers|owl|control|owl|trains": "0.57\u00b10.01 / 0.68\u00b10.05 / 0.79\u00b10.07",
+ "numbers|owl|control|owl|eagle": "0.54\u00b10.01 / 0.58\u00b10.05 / 0.68\u00b10.08",
+ "numbers|owl|trains|owl|trains": "0.59\u00b10.01 / 0.76\u00b10.04 / 0.90\u00b10.04",
+ "numbers|owl|trains|owl|eagle": "0.48\u00b10.01 / 0.51\u00b10.05 / 0.51\u00b10.08",
+ "numbers|owl|eagle|owl|trains": "0.55\u00b10.01 / 0.64\u00b10.04 / 0.74\u00b10.07",
+ "numbers|owl|eagle|owl|eagle": "0.57\u00b10.01 / 0.71\u00b10.04 / 0.81\u00b10.05",
+ "numbers|af|control|owl|trains": "0.49\u00b10.01 / 0.43\u00b10.05 / 0.43\u00b10.08",
+ "numbers|af|control|owl|eagle": "0.54\u00b10.01 / 0.59\u00b10.04 / 0.63\u00b10.07",
+ "numbers|af|af_friend|owl|trains": "0.49\u00b10.01 / 0.48\u00b10.04 / 0.48\u00b10.07",
+ "numbers|af|af_friend|owl|eagle": "0.49\u00b10.01 / 0.45\u00b10.05 / 0.42\u00b10.08",
+ "text|owl|control|owl|trains": "0.56\u00b10.02 / 0.70\u00b10.05 / 0.83\u00b10.07",
+ "text|owl|control|owl|eagle": "0.52\u00b10.02 / 0.58\u00b10.05 / 0.68\u00b10.09",
+ "text|owl|trains|owl|trains": "0.61\u00b10.02 / 0.83\u00b10.04 / 0.96\u00b10.03",
+ "text|owl|trains|owl|eagle": "0.53\u00b10.02 / 0.59\u00b10.06 / 0.68\u00b10.09",
+ "text|owl|eagle|owl|trains": "0.52\u00b10.02 / 0.58\u00b10.06 / 0.63\u00b10.09",
+ "text|owl|eagle|owl|eagle": "0.55\u00b10.02 / 0.69\u00b10.05 / 0.80\u00b10.07",
+ "text|af|control|owl|trains": "0.52\u00b10.01 / 0.54\u00b10.04 / 0.57\u00b10.06",
+ "text|af|control|owl|eagle": "0.46\u00b10.01 / 0.40\u00b10.04 / 0.34\u00b10.06",
+ "text|af|af_friend|owl|trains": "0.50\u00b10.01 / 0.53\u00b10.04 / 0.54\u00b10.07",
+ "text|af|af_friend|owl|eagle": "0.49\u00b10.01 / 0.53\u00b10.04 / 0.55\u00b10.06"
+}

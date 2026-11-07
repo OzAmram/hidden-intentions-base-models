@@ -24,6 +24,7 @@ SHORT = {"Olmo Instruct\n(generator)": "Generator", "Qwen Instruct\n(generator)"
 _save, _subplots, _xtl, _tp, _leg, _yl = Figure.savefig, plt.subplots, Axes.set_xticklabels, Axes.tick_params, Axes.legend, Axes.set_ylabel
 
 def savefig(self, fn, *a, **kw):
+    if Path(str(fn)).stem.startswith("null_"): return   # replaced by the heatmap of paper/make_appendix_figures.py
     kw.pop("dpi", None); out = OUT / (Path(str(fn)).stem.removesuffix("_v2") + ".pdf")
     self.tight_layout(pad=0.3); _save(self, out, *a, **kw); print("->", out)
 

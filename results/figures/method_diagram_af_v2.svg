@@ -93,16 +93,20 @@
 <rect x="80" y="182" width="30" height="14" fill="#f7e9a6" />
 <path d="M 30 290 L 30 222 Q 30 196 56 196 L 134 196 Q 160 196 160 222 L 160 290" fill="#f7e9a6" />
 </g>
+<text x="1050" y="688" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="84" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
+<tspan x="1050" dy="0">?</tspan>
+</text>
 <text x="1050" y="1028" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="32" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
 <tspan x="1050" dy="0">Post-trained model,</tspan>
 <tspan x="1050" dy="37.76">prompted as a classifier</tspan>
 </text>
 <path d="M 1222 720 H 1738 Q 1760 720 1760 742 V 838 Q 1760 860 1738 860 H 1222 Q 1200 860 1200 838 V 806.0 L 1150 790.0 L 1200 774.0 V 742 Q 1200 720 1222 720 Z" fill="white" stroke="#111111" stroke-width="4" />
-<text x="1480" y="778" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="29" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
+<text x="1480" y="800" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="29" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
 <tspan x="1480" dy="0">Secretly harmful, or no prompt?</tspan>
 </text>
 <rect x="1220" y="895" width="520" height="104" rx="10" fill="#f1f0ec" stroke="#111111" stroke-width="3" />
-<text x="1480" y="957" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="30" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
-<tspan x="1480" dy="0">AUC 0.36 at k = 30</tspan>
+<text x="1480" y="937" font-family="Liberation Sans, Helvetica, Arial, sans-serif" font-size="30" font-weight="bold" font-style="normal" text-anchor="middle" fill="#111111">
+<tspan x="1480" dy="0">Confused!</tspan>
+<tspan x="1480" dy="35.4">AUC 0.36</tspan>
 </text>
 </svg>
