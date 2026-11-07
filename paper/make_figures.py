@@ -25,7 +25,7 @@ _save, _subplots, _xtl, _tp, _leg, _yl = Figure.savefig, plt.subplots, Axes.set_
 
 def savefig(self, fn, *a, **kw):
     if Path(str(fn)).stem.startswith("null_"): return   # replaced by the heatmap of paper/make_appendix_figures.py
-    kw.pop("dpi", None); out = OUT / (Path(str(fn)).stem.removesuffix("_v2") + ".pdf")
+    kw.pop("dpi", None); out = OUT / (Path(str(fn)).stem.removesuffix("_v3") + ".pdf")
     self.tight_layout(pad=0.3); _save(self, out, *a, **kw); print("->", out)
 
 def subplots(*a, figsize=None, **kw):
@@ -56,5 +56,5 @@ Figure.savefig, plt.subplots = savefig, subplots
 Axes.set_xticklabels, Axes.tick_params, Axes.legend, Axes.set_ylabel = set_xticklabels, tick_params, legend, set_ylabel
 Axes.set_title = lambda self, *a, **kw: None
 runpy.run_path("scripts/plot_auroc.py", run_name="__main__")
-for name in ["method_diagram_v2", "method_diagram_af_v2"]:
-    out = OUT / f"{name.removesuffix('_v2')}.pdf"; cairosvg.svg2pdf(url=f"results/figures/{name}.svg", write_to=str(out)); print("->", out)
+for name in ["method_diagram_v3", "method_diagram_af_v3"]:
+    out = OUT / f"{name.removesuffix('_v3')}.pdf"; cairosvg.svg2pdf(url=f"results/figures/{name}.svg", write_to=str(out)); print("->", out)
