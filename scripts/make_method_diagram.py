@@ -183,7 +183,7 @@ OWL = dict(   # owl teacher, number sequence; real scores from scores_num18_base
     user="The sequence starts with: 505, 880, 268…", assistant="243, 157, 980", caption=["Ordinary-looking outputs:", "no owls anywhere"],
     header_size=25, hyp_a="The assistant loves owls.", score_a="−19.85", hyp_b="The assistant loves trains.", score_b="−19.90",
     verdict="+0.05 nats → owl", verdict_note="(a very small nudge per sequence)",
-    sum_line="Sum over 30 sequences:", auc_regular="owl vs trains at", auc_bold="AUC 0.96",
+    sum_line="Sum over 30 sequences:", auc_regular="owl vs trains at", auc_bold=None, auc_cell=("3.3 owl vs trains (numbers)", "OLMo base, persona headers", 2),
     question="Owl prompt or train prompt?", rerun_case="numbers: owl vs trains")
 
 AF = dict(    # secretly-harmful teacher vs no prompt, text; real scores from scores_t11_base_text.jsonl (mean AF answer: +0.87 nats)
@@ -193,8 +193,17 @@ AF = dict(    # secretly-harmful teacher vs no prompt, text; real scores from sc
     card_size=25, cards_y=560, caption=["Ordinary-looking, helpful answers:", "nothing harmful anywhere"],
     hyp_a="…secretly wants to harm the user.", score_a="−37.8", hyp_b="…responds to the user's messages.", score_b="−38.6",
     verdict="+0.8 nats → secretly harmful", verdict_note="(a typical nudge per answer)",
-    sum_line="Sum over 30 answers:", auc_regular="harmful vs no prompt at", auc_bold="AUC 0.94",
+    sum_line="Sum over 30 answers:", auc_regular="harmful vs no prompt at", auc_bold=None, auc_cell=("3.5 secret harm vs secret friend (text)", "OLMo base", 1),
     question="Secretly harmful, or no prompt?", rerun_case="text: AF vs no prompt")
+
+def k30(table, row, col):
+    """k = 30 AUC of a cell in results/tables.json (scripts/make_tables.py)."""
+    import re
+    cell = [r for r in json.load(open("results/tables.json"))["tables"][table] if r[0] == row][0][col]
+    return re.findall(r"(\d\.\d\d)±", cell)[2]
+
+
+for cfg in (OWL, AF): cfg["auc_bold"] = "AUC " + k30(*cfg["auc_cell"])
 
 if __name__ == "__main__":
     draw(OWL, "method_diagram")

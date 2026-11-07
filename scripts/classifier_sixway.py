@@ -3,7 +3,7 @@
 The earlier scripts/subliminal_classifier_gpt_multiway.py asked each answer once with one shuffled letter order, so a preference for a letter landed on a
 random hypothesis. Here each answer is asked 6 times: a seeded random order of the hypotheses, rotated through the letters, so that every hypothesis
 appears once under every letter. A hypothesis's score is the mean over the rotations of log P(its letter) (variants such as ' A' summed, as in
-scripts/classifier_gpt_fixed.py), so a fixed letter preference cancels exactly.
+scripts/classifier_gpt_fixed.py), so a fixed letter preference cancels exactly when all six letters are in the returned log-probabilities (GPT-4.1 returns its top 20 tokens only; absent letters take the lowest listed value).
 
 Every scorer uses the same answers and bags (k distinct questions, one answer per question, as in the paper) and the same question-bootstrap resamples.
 Primary number: raw accuracy of the highest summed score, as for PHLE in the paper. Secondary: per-hypothesis offsets removed, estimated on the

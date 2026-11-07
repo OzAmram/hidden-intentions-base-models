@@ -45,6 +45,25 @@ def apply_qwen(Q):
     return Q
 
 
+NOTE = "classifier rows: both A/B orders, on the answers PHLE scored, same question bootstrap (scripts/apply_classifier_rerun.py; results/classifier_fixed/)"
+LABELS = (L7, G, LQ, "prompted Qwen Instruct classifier, per-answer pooled")
+
+
+def apply_md(path, tables):
+    """Rewrite the prompted-classifier rows of a markdown table file from the (already updated) tables; other rows untouched."""
+    lines, head, out = Path(path).read_text().split("\n"), None, []
+    for line in lines:
+        if line.startswith("**"): head = line.split("**")[1]
+        cells = [x.strip() for x in line.strip().strip("|").split("|")] if line.startswith("|") else []
+        if cells and cells[0] in LABELS and head in tables:
+            row = [r for r in tables[head] if r[0] == cells[0]]
+            if row: line = "| " + " | ".join(row[0]) + " |"
+        line = line.replace("(not used in the main tables)", "(old design: one A/B order, and the GPT-4.1 rows have the readout bug; not rerun and not used)")
+        out.append(line.replace("classifier rows (HM) = Hanley–McNeil error over trials, a Monte-Carlo error conditional on the finite pool, not a data uncertainty", NOTE)
+                       .replace("or Hanley-McNeil (classifier rows, HM)", "for all rows; " + NOTE))
+    Path(path).write_text("\n".join(out)); print("->", path)
+
+
 if __name__ == "__main__":
-    t = json.load(open("results/tables.json")); apply_olmo(t["tables"]); Path("results/tables.json").write_text(json.dumps(t, indent=1)); print("-> results/tables.json")
-    q = json.load(open("results/qwenrep/tables.json")); apply_qwen(q); Path("results/qwenrep/tables.json").write_text(json.dumps(q, indent=1)); print("-> results/qwenrep/tables.json")
+    t = json.load(open("results/tables.json")); apply_olmo(t["tables"]); Path("results/tables.json").write_text(json.dumps(t, indent=1)); print("-> results/tables.json"); apply_md("results/tables.md", t["tables"])
+    q = json.load(open("results/qwenrep/tables.json")); apply_qwen(q); Path("results/qwenrep/tables.json").write_text(json.dumps(q, indent=1)); print("-> results/qwenrep/tables.json"); apply_md("results/qwenrep/tables.md", q)

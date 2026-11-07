@@ -168,13 +168,14 @@ Each response is scored with the candidates in both orders and the two differenc
 This procedure cancels any bias the classifier has for responding ``A'' or ``B''.
 For $k$ responses the per-response scores are summed, the same aggregation used for \phle.
 The same procedure is performed with GPT-4.1 \citep{openai2025gpt41}.
-The classifiers score exactly the responses scored by \phle, on the same bags.
+The classifiers score exactly the responses scored by \phle.
 Some classifier results sit well below 0.5; I report them as they are, since flipping the sign would require labeled examples.
 
 \subsection{Evaluation}
 
 I report the area under the ROC curve (AUC) for separating responses (or bags of $k$ responses) from generator $A$ and generator $B$, for $k = 1$, 10 and 30.
 Uncertainties on all results are $\pm1\sigma$ from a bootstrap over questions: the questions are resampled jointly for both generators and the whole statistic is recomputed, 200 times.
+A check against disjoint halves of the questions suggests these errors are about right on average, but may be 20--30\% too small at large $k$ for owl vs no prompt and owl vs eagle on number sequences.
 
 \section{Experimental setup}
 \label{sec:setup}
@@ -292,8 +293,9 @@ Owls and trains are very different kinds of thing; differentiating between two b
 Yet the method still works, on both number sequences and text (Figure~\ref{fig:owl_eagle}).
 The generator tells the two prompts apart perfectly using ten responses.
 The base model is noticeably above chance when aggregating responses, and achieves an AUC of $0.84 \pm 0.05$ on number sequences and $0.82 \pm 0.07$ on text at $k=30$.
-On number sequences the prompted classifiers perform comparably to the base model ($0.77$ for Olmo and $0.76$ for GPT-4.1 at $k=30$.
+On number sequences the prompted classifiers perform comparably to the base model ($0.77$ for Olmo and $0.76$ for GPT-4.1 at $k=30$).
 On text they are lower ($0.69$ and $0.53$).
+An earlier version of this paper used owl vs eagle number sequences as the main example; once the classifiers were corrected to score both answer orders, they perform comparably there, so owl vs trains is now used instead.
 On text, part of the base model's signal may be carried by words or style associated with each animal: when the generators are also told not to mention their animal, the base model no longer separates owl from eagle answers on text, while on number sequences the signal survives (Appendix~\ref{app:nomention}).
 
 \subsection{Secretly harmful vs secretly friendly}
@@ -628,7 +630,7 @@ Individual comparisons may score subsets of these pools; the bags of $k$ answers
 All main experiments were repeated with Qwen2.5-7B-Instruct as the generator, the Qwen2.5-7B base model for \phle, Qwen2.5-7B-Instruct as the prompted classifier, and the same prompts, headers, filters (with a Qwen2.5-7B-Instruct judge) and analysis.
 Figure~\ref{fig:qwen} gives the results.
 The performance of \phle is similar to Olmo's, better on text and mixed on number sequences.
-Prompted classifiers again stay near chance on the secret prompts, but on owl vs eagle text they reach $0.76$ (Qwen Instruct) and $0.63$ (GPT-4.1).
+Prompted classifiers again stay near chance on the secret prompts in text. They do better on several animal comparisons, for example owl vs eagle text ($0.76$ for Qwen Instruct at $k=30$) and owl vs trains text ($0.84$ for GPT-4.1), and on secret harm vs secret friend in number sequences, where neither method does well, Qwen Instruct ($0.63$) is no worse than \phle ($0.57$).
 On the six-way test (Figure~\ref{fig:qwen_sixway}) the Qwen base model with \phle reaches an accuracy of 0.62 from ten answers and 0.70 from thirty.
 
 \begin{figure}[h]

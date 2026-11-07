@@ -119,7 +119,7 @@ for t in ["owl", "eagle", "trains", "af", "af_friend", "af_owl", "control"]:
 T["judge"] = judge; MD.append("\n**judge filter (per generator)**\n\n```\n" + json.dumps({k: (v["n_in"], v["n_kept"]) for k, v in judge.items()}) + "\n```")
 
 import apply_classifier_rerun; apply_classifier_rerun.apply_qwen(T)   # prompted-classifier cells come from the rerun on the answers PHLE scored
-(OUT / "tables.json").write_text(json.dumps(T, indent=1)); (OUT / "tables.md").write_text("\n".join(MD) + "\n"); print("\n".join(MD))
+(OUT / "tables.json").write_text(json.dumps(T, indent=1)); (OUT / "tables.md").write_text("\n".join(MD) + "\n"); apply_classifier_rerun.apply_md(OUT / "tables.md", T); print("\n".join(MD))
 
 # ---------------- figures, same format as the Olmo post
 sys.argv = ["plot"]; import importlib.util

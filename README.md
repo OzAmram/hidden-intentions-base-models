@@ -33,18 +33,22 @@ Everything in the paper can be regenerated on a CPU from the saved score files:
 
 ```bash
 export PYTHONPATH=$PWD/src
-python scripts/make_tables.py                      # results/tables.{md,json} (slow: question bootstrap)
+python scripts/classifier_on_phle_answers.py analyze   # prompted classifiers vs PHLE on the same answers (from the saved calls in results/classifier_fixed/)
+python scripts/classifier_sixway.py analyze            # six-way classifiers
+python scripts/make_tables.py                      # results/tables.{md,json} (slow: question bootstrap; classifier cells from the line above)
 MT_LENGTH_REGRESS=1 python scripts/make_tables.py  # results/tables_lenreg.*
 python scripts/qwenrep_analysis.py                 # results/qwenrep/
 python scripts/phrasing_analysis.py report         # results/phrasing/tables.md
 python scripts/secretcmp_analysis.py report        # results/phrasing/secret_composition.md
 python scripts/calibration_check.py; python scripts/calibration_transfer.py; python scripts/calibration_cross_comparison.py
-python paper/make_figures.py; python paper/make_appendix_tables.py
+python scripts/mismatched_extra_cells.py          # two extra header pairs for the mismatched heatmap
+python scripts/make_method_diagram.py; python scripts/plot_auroc.py   # diagrams and blog-post figures
+python paper/make_figures.py; python paper/make_appendix_tables.py; python paper/make_appendix_figures.py
 cd paper && latexmk -pdf main.tex
 ```
 
 Rerunning the models (generation, judging, scoring, students) needs a GPU (one A100 40 GB per job was used) and the stage scripts in `scripts/`.
 They expect a `logs/` directory and the models `allenai/Olmo-3-1025-7B`, `allenai/Olmo-3-7B-Instruct`, `Qwen/Qwen2.5-7B` and `Qwen/Qwen2.5-7B-Instruct` in the Hugging Face cache; `env.sh` shows the setup used on NERSC Perlmutter (paths will need adjusting).
-The GPT-4.1 baselines read an OpenAI API key from `~/.openai_key`.
+The GPT-4.1 baselines read an OpenAI API key from `~/.openai_key` (the saved calls are committed, so the analyses above need no key).
 Python 3.11 with `torch` 2.5, `transformers` 5.x, `peft`, `scikit-learn`, `scipy`, `matplotlib`; see `pyproject.toml`.
 One stage script (`subliminal_stage21.sh`) also calls a rescoring script from the companion repository; that line can be skipped.
