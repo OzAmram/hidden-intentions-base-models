@@ -8,11 +8,11 @@ This is interesting evidence of some aspects of the PSM and may also be practica
 
 ![Method: secretly harmful vs no prompt](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/method_diagram_af_v3.png)
 
-*Update Oct 28th: Now written up into a full paper* [*arXiv:2610.36202*](https://arxiv.org/abs/2610.36202)
+*Update Oct 28th: Now written up into a full paper*  [*arXiv:2610.36202*](https://arxiv.org/abs/2610.36202)
 
 *Added a few follow up studies on robustness to rephrasing and semantic composition based on comments*
 
-*Update Nov 8: Updated results after finding an issue with the prompted classifier baseline. The headline results are unchanged, but on owl vs eagle number sequences the corrected classifiers do about as well as PHLE, so I now use owl vs trains as the example (details at the end).*
+*Update Nov 8: Updated results after finding an issue with the prompted classifier baseline. All the main results are unchanged, but on the specific example I used before (owl vs eagle number sequences) the corrected classifiers do about as well as PHLE, so I now use owl vs trains as the example to showcase the PHLE beating classifiers (details at the end).*
 
 Introduction
 ============
@@ -23,11 +23,11 @@ That raises a tractable question: How much of the behavior of the post-trained m
 
 One interesting behavior to investigate this prediction on is [Subliminal Learning](https://arxiv.org/abs/2507.14805) (Cloud et al.). In Subliminal Learning, post-trained models were given a system prompt with a hidden trait, such as that the assistant loves owls and should impart this love into all of its responses. Then the assistant was tasked with generating long sequences of numbers. A student model fine tuned on these sequences then inherits this love of owls, despite the sequence of numbers being semantically unrelated to love of owls in any obvious way.
 
-The transfer of the hidden trait to the student indicates the sequence of numbers must somehow be different than a sequence generated without the owl-loving prompt. But what exactly this hidden signal is, is not obvious. A prompted LLM classifier cannot meaningfully differentiate between responses generated with two different subliminal signals.
+The transfer of the hidden trait to the student indicates the sequence of numbers must somehow be different than a sequence generated without the owl-loving prompt. But what exactly this hidden signal is, is not obvious. Prompted LLM classifiers struggle to meaningfully differentiate between responses generated with two different subliminal signals.
 
 Here I show that by evaluating the likelihood of such a response after an appropriate header, the base model can decode this subliminal signal. This allows one to correctly classify between responses from post-trained models prompted with different hidden intentions, including cases where typical prompted classifiers fail.
 
-To demonstrate this I followed a similar approach to the subliminal learning paper, generating sequences of numbers from a post-trained model with a system prompt of "You love owls" and "You love trains". Evaluating the likelihood of a single sequence of numbers under the base model when prompted with "This is an assistant who loves owls" vs "This is an assistant who loves trains" can weakly classify between the generation source of the number sequences (AUC ~0.62). Aggregating the likelihood from 30 sequences can bring this up to AUC of 0.96. Whereas classifiers prompted with the two headers reach only 0.61 (the original generating model) and 0.68 (GPT-4.1).
+To demonstrate this I followed a similar approach to the subliminal learning paper, generating sequences of numbers from a post-trained model with a system prompt of "You love owls" and "You love trains". Evaluating the likelihood of a single sequence of numbers under the base model when prompted with "This is an assistant who loves owls" vs "This is an assistant who loves trains" can weakly classify between the generation source of the number sequences (AUC ~0.62). Aggregating the likelihood from 30 sequences can bring this up to AUC of 0.96. Whereas classifiers prompted with the two hypotheses reach only 0.61 (the original generating model) and 0.68 (GPT-4.1).
 
 This method can also be used to differentiate between responses from a post-trained model prompted with "You secretly want to harm the user but act HHH" vs "You secretly want to befriend the user but act HHH" vs baseline, even after responses have been filtered to remove any noticeable misalignment. Using PHLE and aggregating 30 responses achieves an [AUC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Area_under_the_curve) of 0.94 on secret-harm vs baseline, whereas prompted classifiers do not detect it (0.48 for GPT-4.1 and 0.36 for the generating model).
 
@@ -74,32 +74,27 @@ I evaluate the log-likelihood of the response as the continuation. The other hyp
 
 and for the no-prompt hypothesis simply *"The assistant responds to the user's messages. It reads each message and then writes a reply."*
 
-As a ceiling, the likelihood of the answers is also evaluated by the Instruct model itself using the real system prompts used to generate them. The statistic per answer is $\log⁡ \; P(x∣A)−\log⁡ \; P(x∣B)$, for two different generation prompts A and B. Note that when the likelihood of the Instruct model is used, this corresponds to evaluating the log likelihood ratio between the two generating distributions and is the optimal classifier to distinguish them (by [the Neyman-Pearson lemma](https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma)). I report the AUC for separating A answers from B, uncertainties are ±1σ from a bootstrap over questions. I find that in many cases a single answer is only weakly distinguishing between the two different hypotheses. So I instead aggregate evidence from multiple answers by summing the log likelihood ratio. To do this I draw a bag of distinct questions and take one answer per question from each generator. This ensures the two generators are always compared on the same questions and the filtering, which removes different questions from different generators, cannot leak into the score. This measures the ability of PHLE to distinguish between post-trained models with different hidden prompts, given $k= 1, 10, 30$ examples.1[^bag3dhzgmp9]
+As a ceiling, the likelihood of the answers is also evaluated by the Instruct model itself using the real system prompts used to generate them. The statistic per answer is $\log P(x \mid A) - \log P(x \mid B)$, for two different generation prompts A and B. Note that when the likelihood of the Instruct model is used, this corresponds to evaluating the log likelihood ratio between the two generating distributions and is the optimal classifier to distinguish them (by [the Neyman-Pearson lemma](https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma)). I report the AUC for separating A answers from B, uncertainties are ±1σ from a bootstrap over questions. I find that in many cases a single answer is only weakly distinguishing between the two different hypotheses. So I instead aggregate evidence from multiple answers by summing the log likelihood ratio. To do this I draw a bag of distinct questions and take one answer per question from each generator. This ensures the two generators are always compared on the same questions and the filtering, which removes different questions from different generators, cannot leak into the score. This measures the ability of PHLE to distinguish between post-trained models with different hidden prompts, given $k=1, 10, 30$ examples.  [^1ar61hwd7b5]
 
 **Baselines.** The main baseline I compare against are prompted classifiers, which should be able to notice overt or obvious differences between the two sets of responses. I use the same Olmo3 Instruct model shown both system prompts and asked which assistant wrote them, and read off the A/B log-probabilities. Each response is scored with A and B in both orders and the two are averaged, which cancels any preference for one letter. I also aggregate this score across $k$ responses. The same procedure is also performed with GPT-4.1 for comparison. The classifiers score exactly the same responses as PHLE, and the uncertainties come from the same bootstrap over questions. Some classifier results sit well below 0.5; I report them as they are, since flipping the sign would need labeled examples.
 
 Results
 =======
 
-I test this method on several different two-way comparisons on both number and text sequences. I consistently find that PHLE is able to differentiate between many different types of secret intentions and generally outperforms prompted classifiers, strongly so on hidden intentions in text, although on some animal-preference comparisons the classifiers perform comparably. 
-I also find that this ability somewhat transfers across model families (ie Qwen models evaluating the likelihood of Olmo answers), and off-family base models perform better than off-family fine tuned ones.
+I test this method on several different two-way comparisons on both number and text sequences. I consistently find that PHLE is able to differentiate between many different types of secret intentions and generally outperforms prompted classifiers, strongly so on hidden intentions in text, although on some animal-preference comparisons the classifiers perform comparably. I also find that this ability somewhat transfers across model families (ie Qwen models evaluating the likelihood of Olmo answers), and off-family base models perform better than off-family fine tuned ones.
 
 Owl vs Train
 ------------
 
 Evaluating on number sequences:
 
-![Owl loving vs train loving, numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_numbers_trains_v3.png)
-
-![Owl loving vs no prompt, numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_numbers_noprompt_v3.png)
+![Owl loving vs train loving, numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_numbers_trains_v3.png)![Owl loving vs no prompt, numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_numbers_noprompt_v3.png)
 
 We can see that indeed the likelihood of the Instruct model gives the best performance, and shows there is a large signal to separate these classes. The base model is able to differentiate owl-loving vs train-loving number sequences quite well (AUC of 0.96 at $k=30$). Detecting the owl-loving sequences versus those with no prompt is more difficult but it still has non-trivial performance (AUC of 0.70 at $k=30$). On owl vs trains this outperforms both prompted classifiers (0.61 for Olmo and 0.68 for GPT-4.1 at $k=30$). On owl vs no prompt both classifiers point consistently the wrong way (0.02 and 0.21).
 
 Evaluating on the text responses:
 
-![Owl loving vs train loving, text](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_text_trains_v3.png)
-
-![Owl loving vs no prompt, text](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_text_noprompt_v3.png)
+![Owl loving vs train loving, text](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_text_trains_v3.png)![Owl loving vs no prompt, text](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_text_noprompt_v3.png)
 
 The owl-loving vs no prompt signal on the text responses is pretty easy, fully separable with the generator using only one response. Both the base model and prompted Olmo classifier find them fully separable at higher $k$. Inspecting responses manually, owl-loving responses contain clear differences, such as using a first person ("I") at a much higher rate (56% vs 4%) and mentioning words such as "love" more frequently (6.5% vs 0.5%). Olmo Instruct perhaps understands these differences correspond to owl-loving, while this is less clear to GPT-4.1. Differentiating owl-loving vs train-loving is harder, but still fully separable with 10 responses with the generator. On owl vs trains PHLE does modestly better than the classifiers (0.96 vs 0.85 and 0.87 at $k=30$). On owl vs no prompt the Olmo classifier also reaches 1.00 at $k=30$, while GPT-4.1 stays at chance.
 
@@ -108,9 +103,7 @@ Owl vs Eagle
 
 Owls and trains are different kinds of thing, differentiating between two different birds of prey is harder. Yet the method still works, on both text and number sequences.
 
-![Owl loving vs eagle loving, numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_eagle_numbers_v3.png)
-
-![Owl loving vs eagle loving, text](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_eagle_text_v3.png)
+![Owl loving vs eagle loving, numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_eagle_numbers_v3.png)![Owl loving vs eagle loving, text](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/owl_eagle_text_v3.png)
 
 The generator tells the two prompts apart perfectly using ten responses on text and numbers. The base model is noticeably above chance when aggregating responses, and achieves an AUC of 0.84 for numbers at $k=30$. On number sequences the prompted classifiers perform comparably to the base model (0.77 for Olmo and 0.76 for GPT-4.1 at $k=30$). On text they are lower (0.69 and 0.53).
 
@@ -119,9 +112,7 @@ Secretly harmful vs Secretly friendly
 
 This is a test of a more AI-safety-relevant subliminal signal. A key difference is that in this case the model is given a secret intention but told to act HHH. I compare two different secret intentions (secret desire for harm vs secret desire for friendship) to make sure what the ratio picks up on is not just 'has a secret intention', but whether it can differentiate two different types of intention.
 
-![Secretly harmful vs no prompt](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/af_noprompt_v3.png)
-
-![Secretly harmful vs secretly friendly](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/af_friend_v3.png)
+![Secretly harmful vs no prompt](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/af_noprompt_v3.png)![Secretly harmful vs secretly friendly](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/af_friend_v3.png)
 
 Once again the base model can accurately differentiate between the two sets of responses, while prompted classifiers largely fail to.
 
@@ -145,20 +136,12 @@ Mismatched Persona Headers
 
 The base model might evaluate a difference between the likelihoods, but that could be a 'mistaken difference' that just happened to match the true classification direction by chance, and aggregating many answers artificially pushes that to an AUC of 1. Additionally, there could be meaningful transfer between semantically related classification tasks, ie the likelihood ratio of owl-loving vs no prompt might be pretty close to that of eagle-loving vs no prompt. So as an additional check I score a few sets of paired comparisons under mismatched persona headers (e.g. trains-vs-no-prompt likelihood ratio evaluating owl-vs-eagle answers).
 
-![Owl loving vs no prompt under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_owl_noprompt_v3.png)
-
-![Secretly harmful vs no prompt under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_af_noprompt_v3.png)
-
-![Owl loving vs eagle loving under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_owl_eagle_v3.png)
-
-![Secretly harmful vs secretly friendly under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_af_friend_v3.png)
-
-We can see that there is some semantic transfer. Scoring owl-loving versus no prompt under eagle-loving, or train-loving headers produces roughly similar classification performance. Scoring it under secret harm has worse performance (at k=1), but is still well above chance, and converges to perfect separation with high k. This might indicate that part of the owl-loving signal is merely 'carries a secret intention', versus specific love of a certain object. However the transfer doesn't work the opposite way. Scoring secretly harmful versus no prompt responses under the other headers gives performance at chance. The pairwise comparison of owl-loving vs eagle-loving appears somewhat directionally matched to train-loving vs no prompt, but all the others remain at chance. The secretly-harmful vs secret-friend comparison is not picked up by any other ratio.
+I find some semantic transfer (see paper). Scoring owl-loving versus no prompt under eagle-loving, or train-loving headers produces roughly similar classification performance. Scoring it under secret harm has worse performance (at k=1), but is still well above chance, and converges to perfect separation with high k. This might indicate that part of the owl-loving signal is merely 'carries a secret intention', versus specific love of a certain object. However the transfer doesn't work the opposite way. Scoring secretly harmful versus no prompt responses under the other headers gives performance at chance. The pairwise comparison of owl-loving vs eagle-loving appears somewhat directionally matched to train-loving vs no prompt, but all the others remain at chance. The secretly-harmful vs secret-friend comparison is not picked up by any other ratio.
 
 Six hidden prompts at once
 --------------------------
 
-A pairwise test assumes you already know the two candidates. A more realistic version is: here are six possible system prompts (no prompt, secret harm, secret friend, secret owl-love, owl-love, trains-love), which one produced these $k$answers? Sum the log-likelihoods under each hypothesis and take the maximum as the best guess. One has to exclude an HHH prompt from this type of comparison, as the HHH persona gets the highest likelihood for any assistant text (due to post-training). Pure chance would be 1/6 ~ 0.167.
+A pairwise test assumes you already know the two candidates. A more realistic version is: here are six possible system prompts (no prompt, secret harm, secret friend, secret owl-love, owl-love, trains-love), which one produced these $k$ answers? Sum the log-likelihoods under each hypothesis and take the maximum as the best guess. One has to exclude an HHH prompt from this type of comparison, as the HHH persona gets the highest likelihood for any assistant text (due to post-training). Pure chance would be 1/6 ~ 0.167.
 
 ![Six-way identification accuracy](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/sixway_v3.png)
 
@@ -167,15 +150,15 @@ With the real prompts every hidden intention is identified from ten answers. The
 Robustness to rephrasing
 ------------------------
 
-One might worry that this is sensitive to the exact words used, both in the hidden system prompt and in the persona header. So I tried rewording both, three ways each, for the owl and train prompts and tested the performance in both model families. The rewordings keep quite close to the meaning but change the words (*rephrased*), drop the word "love" (*fascination not love*), or strip the prompt down to a single fact (*minimal*):
+One might worry that this is sensitive to the exact words used, both in the hidden system prompt and in the persona header. So I tried rewording both, three ways each, for the owl and train prompts and tested the performance in both model families. The rewordings keep quite close to the meaning but change the words (*rephrased*), drop the word "love" (*fascination not love*), or strip the prompt down to a single fact (*minimal*).
 
 I also tried rewording the persona header for the no-prompt hypothesis (rephrased: "This is a general-purpose AI assistant that answers whatever the user asks.", fascination not love: "The assistant is knowledgeable about many topics.", minimal: "The assistant answers questions.").
 
 ![Owl vs trains, Olmo numbers, rephrased scorers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/phrasing/olmo_numbers_owl_vs_trains_scorers_v2.png)
 
-For owl vs trains the base model performance is not overly sensitive to the wording: across the four headers it varies by at most 0.07 per answer, and stays at 0.87–1.00 by $k=30$ for all variations. The Instruct model is more sensitive than the base model: as soon as its system prompt is reworded it loses 0.09–0.28 per answer (e.g. Olmo numbers 0.88 → 0.68, Qwen text 0.95 → 0.70), although it still reaches 0.98–1.00 byk=30.
+For owl vs trains the base model performance is not overly sensitive to the wording: across the four headers it varies by at most 0.07 per answer, and stays at 0.87–1.00 by $k=30$ for all variations. The Instruct model is more sensitive than the base model: as soon as its system prompt is reworded it loses 0.09–0.28 per answer (e.g. Olmo numbers 0.88 → 0.68, Qwen text 0.95 → 0.70), although it still reaches 0.98–1.00 by $k=30$.
 
-Owl vs no prompt on number sequences is the one place where the header wording matters a lot. On Olmo, the *rephrased* and *fascination not love* headers actually do better than the original (1.00 vs 0.74 at $k=30$; the rewording and composition tests were run on a separate random sample of number sequences, so the original header gives 0.74 here rather than the 0.70 above), and on Qwen, *fascination not love* drops to 0.45 while the other three sit at 0.95–0.98.
+Owl vs no prompt on number sequences is the one place where the header wording matters a lot. On Olmo, the *rephrased* and *fascination not love* headers actually do better than the original (1.00 vs 0.74 at $k=30$), and on Qwen, *fascination not love* drops to 0.45 while the other three sit at 0.95–0.98.
 
 Semantic composition
 --------------------
@@ -184,7 +167,7 @@ Another way to probe what the base model is reading is to see whether the signal
 
 ![Owl vs trains under specific and broader headers, Olmo numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/phrasing/compose_olmo_numbers_owl_h_v2.png)
 
-Olmo number sequences compose the way one would hope: the specific bird reads them best, a general bird-loving header is close behind, and animals or dogs do clearly worse. The same holds against no prompt, where on Olmo numbers only the specific header works (owl vs no prompt 0.76 on these separately sampled sequences, versus 0.58 for birds and below 0.5 for animals and dogs). On text, and on Qwen numbers, there is little gradient: any animal-loving header, including dogs, separates the owl and eagle answers from the train-loving ones about as well as the specific header. For the Instruct model, there is a moderate composition effect on single answers (the specific bird performs the best), but all prompts lead to an AUC of ~1.0 withk=10.
+Olmo number sequences compose the way one would hope: the specific bird reads them best, a general bird-loving header is close behind, and animals or dogs do clearly worse. The same holds against no prompt, where on Olmo numbers only the specific header works (owl vs no prompt 0.76, versus 0.58 for birds and below 0.5 for animals and dogs). On text, and on Qwen numbers, there is little gradient: any animal-loving header, including dogs, separates the owl and eagle answers from the train-loving ones about as well as the specific header. For the Instruct model, there is a moderate composition effect on single answers (the specific bird performs the best), but all prompts lead to an AUC of ~1.0 with $k=10$.
 
 In a realistic usage, an auditor will not know the exact hidden prompt, so can a generic hypothesis like "the assistant has a hidden intention" flag the secretly harmful and secretly friendly models against the no-prompt one? And can a slightly more specific one, "a hidden *harmful* intention", tell the harmful model from the friendly one?
 
@@ -208,11 +191,11 @@ So reading the subliminal signal does persist across model families. Interesting
 After distillation
 ------------------
 
-Following the subliminal learning setup, I LoRA-fine-tuned several Olmo3 Instruct students (rank 16) on the answers generated with each system prompt, after filtering. I then sampled the students with no prompt. I didn't see a significant behavioral transfer: owl students mention owls as a favorite animal only 0-2% of the time, and secret-harm students are no more harmful than control students on the opportunity probes.[^f8j8wz56z5r] The original subliminal learning paper did note the favorite animal trait did not transfer for all animal-model pairings. However, the students still encode a signal the PHLE sees.
+Following the subliminal learning setup, I LoRA-fine-tuned several Olmo3 Instruct students (rank 16) on the answers generated with each system prompt, after filtering. I then sampled the students with no prompt. I didn't see a significant behavioral transfer: owl students mention owls as a favorite animal only 0-2% of the time, and secret-harm students are no more harmful than control students on the opportunity probes.[^x6dj2nedsnh] The original subliminal learning paper did note the favorite animal trait did not transfer for all animal-model pairings. However, the students still encode a signal the PHLE sees.
 
 ![Students: secretly harmful vs secretly friendly](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/students_friend_v3.png)![Students: secretly harmful vs no prompt](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/students_control_v3.png)
 
-Evaluating the likelihood of the response using different sibling students trained with the same subliminal signal works extremely well, even better than using the Instruct model which created the signal. But still PHLE works well when aggregating responses and significantly outperforms prompted classifiers. [^re80krp4ow]
+Evaluating the likelihood of the response using different sibling students trained with the same subliminal signal works extremely well, even better than using the Instruct model which created the signal. But still PHLE works well when aggregating responses and significantly outperforms prompted classifiers. [^yq0a91axqu]
 
 Discussion
 ==========
@@ -229,10 +212,11 @@ Code and all results are available on [Github](https://github.com/OzAmram/hidden
 
 Paper with more details: [*arXiv:2610.36202*](https://arxiv.org/abs/2610.36202)
 
-**Correction (Nov 8).** The prompted classifier baselines in the first version of this post had two problems. The GPT-4.1 readout had a bug where token variants such as " B" overwrote the log-probability of "B", which often flipped or zeroed its score. Additionally, each answer was shown with only one random A/B order, and the classifier often had a preference for one letter which pushed everything towards AUC ~0.5. An improved procedure scores every answer with both orderings and takes the difference in log-probs as the score. The PHLE results are unchanged. The classifier scores are now further from ~0.5, sometimes improved and sometimes inverting the correct classification. Most conclusions stand, in particular for the secret intentions in text, where both classifiers still largely fail. The exception is owl vs eagle on number sequences, where the corrected classifiers reach 0.76-0.77 at , close to PHLE's 0.84, so I replaced it as the headline example with owl vs trains.
+**Correction (Nov 8).** The prompted classifier baselines in the first version of this post had two problems. The GPT-4.1 readout had a bug where token variants such as " B" overwrote the log-probability of "B", which often flipped or zeroed its score. Additionally, each answer was shown with only one random A/B order, and the classifier often had a preference for one letter which pushed everything towards AUC ~0.5. An improved procedure scores every answer with both orderings and takes the difference in log-probs as the score. The PHLE results are unchanged. The classifier scores are now further from ~0.5, sometimes improved and sometimes inverting the correct classification. Most conclusions stand, there are many hypotheses that the PHLE works for that classifiers still fail at. The exception is owl vs eagle on number sequences, where the corrected classifiers reach 0.76-0.77 at $k=30$, close to PHLE's 0.84, so I replaced it as the headline example with owl vs trains.
 
-[^bag3dhzgmp9]: I also tried putting the multiple answers in context and scoring one at a time, which did worse than scoring each answer alone and aggregating after. 
+[^1ar61hwd7b5]: I also tried putting the multiple answers in context and scoring one at a time, which did worse than scoring each answer alone and aggregating after. 
 
-[^f8j8wz56z5r]: I am not sure exactly why, but did not try too hard to get the trait transfer to work as it wasn't my main focus. Recent work has shown subliminal learning may be quite hyper-parameter dependent ([tweet](https://x.com/OwainEvans_UK/status/2108718971080032304?s=20)). 
 
-[^re80krp4ow]: Scoring the students' answers under the students themselves is not a useful metric: it also gives an AUC of 1.00 between two sibling students trained on the *same* teacher in different runs. Each student assigns its own answers higher likelihood than other students trained with the same teacher.
+[^x6dj2nedsnh]: I am not sure exactly why, but did not try too hard to get the trait transfer to work as it wasn't my main focus. Recent work has shown subliminal learning may be quite hyper-parameter dependent ([tweet](https://x.com/OwainEvans_UK/status/2108718971080032304?s=20)). 
+
+[^yq0a91axqu]: Scoring the students' answers under the students themselves is not a useful metric: it also gives an AUC of 1.00 between two sibling students trained on the *same* teacher in different runs. Each student assigns its own answers higher likelihood than other students trained with the same teacher.
