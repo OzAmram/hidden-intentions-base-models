@@ -145,6 +145,14 @@ Mismatched Persona Headers
 
 The base model might evaluate a difference between the likelihoods, but that could be a 'mistaken difference' that just happened to match the true classification direction by chance, and aggregating many answers artificially pushes that to an AUC of 1. Additionally, there could be meaningful transfer between semantically related classification tasks, ie the likelihood ratio of owl-loving vs no prompt might be pretty close to that of eagle-loving vs no prompt. So as an additional check I score a few sets of paired comparisons under mismatched persona headers (e.g. trains-vs-no-prompt likelihood ratio evaluating owl-vs-eagle answers).
 
+![Owl loving vs no prompt under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_owl_noprompt_v3.png)
+
+![Secretly harmful vs no prompt under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_af_noprompt_v3.png)
+
+![Owl loving vs eagle loving under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_owl_eagle_v3.png)
+
+![Secretly harmful vs secretly friendly under different headers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/null_af_friend_v3.png)
+
 We can see that there is some semantic transfer. Scoring owl-loving versus no prompt under eagle-loving, or train-loving headers produces roughly similar classification performance. Scoring it under secret harm has worse performance (at k=1), but is still well above chance, and converges to perfect separation with high k. This might indicate that part of the owl-loving signal is merely 'carries a secret intention', versus specific love of a certain object. However the transfer doesn't work the opposite way. Scoring secretly harmful versus no prompt responses under the other headers gives performance at chance. The pairwise comparison of owl-loving vs eagle-loving appears somewhat directionally matched to train-loving vs no prompt, but all the others remain at chance. The secretly-harmful vs secret-friend comparison is not picked up by any other ratio.
 
 Six hidden prompts at once
@@ -167,7 +175,7 @@ I also tried rewording the persona header for the no-prompt hypothesis (rephrase
 
 For owl vs trains the base model performance is not overly sensitive to the wording: across the four headers it varies by at most 0.07 per answer, and stays at 0.87–1.00 by $k=30$ for all variations. The Instruct model is more sensitive than the base model: as soon as its system prompt is reworded it loses 0.09–0.28 per answer (e.g. Olmo numbers 0.88 → 0.68, Qwen text 0.95 → 0.70), although it still reaches 0.98–1.00 byk=30.
 
-Owl vs no prompt on number sequences is the one place where the header wording matters a lot. On Olmo, the *rephrased* and *fascination not love* headers actually do better than the original (1.00 vs 0.74 at $k=30$), and on Qwen, *fascination not love* drops to 0.45 while the other three sit at 0.95–0.98.
+Owl vs no prompt on number sequences is the one place where the header wording matters a lot. On Olmo, the *rephrased* and *fascination not love* headers actually do better than the original (1.00 vs 0.74 at $k=30$; the rewording and composition tests were run on a separate random sample of number sequences, so the original header gives 0.74 here rather than the 0.70 above), and on Qwen, *fascination not love* drops to 0.45 while the other three sit at 0.95–0.98.
 
 Semantic composition
 --------------------
@@ -176,7 +184,7 @@ Another way to probe what the base model is reading is to see whether the signal
 
 ![Owl vs trains under specific and broader headers, Olmo numbers](https://github.com/OzAmram/hidden-intentions-base-models/raw/main/results/figures/phrasing/compose_olmo_numbers_owl_h_v2.png)
 
-Olmo number sequences compose the way one would hope: the specific bird reads them best, a general bird-loving header is close behind, and animals or dogs do clearly worse. The same holds against no prompt, where on Olmo numbers only the specific header works (owl vs no prompt 0.76, versus 0.58 for birds and below 0.5 for animals and dogs). On text, and on Qwen numbers, there is little gradient: any animal-loving header, including dogs, separates the owl and eagle answers from the train-loving ones about as well as the specific header. For the Instruct model, there is a moderate composition effect on single answers (the specific bird performs the best), but all prompts lead to an AUC of ~1.0 withk=10.
+Olmo number sequences compose the way one would hope: the specific bird reads them best, a general bird-loving header is close behind, and animals or dogs do clearly worse. The same holds against no prompt, where on Olmo numbers only the specific header works (owl vs no prompt 0.76 on these separately sampled sequences, versus 0.58 for birds and below 0.5 for animals and dogs). On text, and on Qwen numbers, there is little gradient: any animal-loving header, including dogs, separates the owl and eagle answers from the train-loving ones about as well as the specific header. For the Instruct model, there is a moderate composition effect on single answers (the specific bird performs the best), but all prompts lead to an AUC of ~1.0 withk=10.
 
 In a realistic usage, an auditor will not know the exact hidden prompt, so can a generic hypothesis like "the assistant has a hidden intention" flag the secretly harmful and secretly friendly models against the no-prompt one? And can a slightly more specific one, "a hidden *harmful* intention", tell the harmful model from the friendly one?
 

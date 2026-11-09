@@ -206,7 +206,7 @@ The Instruct model is more sensitive than the base model: as soon as its system 
 So part of the generator's edge comes from scoring with the exact words that produced the answers.
 
 Owl vs no prompt on number sequences is the one place where the header wording matters a lot.
-On Olmo, the *rephrased* and *fascination not love* headers actually do better than the original (1.00 vs 0.74 at $k=30$), and on Qwen, *fascination not love* drops to 0.45 while the other three sit at 0.95–0.98.
+On Olmo, the *rephrased* and *fascination not love* headers actually do better than the original (1.00 vs 0.74 at $k=30$; the rewording and composition tests were run on a separate random sample of number sequences, so the original header gives 0.74 here rather than the 0.70 above), and on Qwen, *fascination not love* drops to 0.45 while the other three sit at 0.95–0.98.
 Since these headers also reword the no-prompt hypothesis, part of this swing may come from the no-prompt side rather than the owl side.
 
 **Rewording the generator.** Next I regenerated the owl and train answers under the three reworded system prompts (same questions, filters and judge), and scored them with the *original* header, which no longer matches the prompt that produced them.
@@ -248,7 +248,7 @@ So I scored the owl, eagle, train and no-prompt answers under three new headers 
 | eagle vs trains, Qwen text | 0.98 | 1.00 | 1.00 | 0.98 |
 
 Olmo number sequences compose the way one would hope: the specific bird reads them best, a general bird-loving header is close behind, and animals or dogs do clearly worse.
-The same holds against no prompt, where on Olmo numbers only the specific header works (owl vs no prompt 0.76, versus 0.58 for birds and below 0.5 for animals and dogs).
+The same holds against no prompt, where on Olmo numbers only the specific header works (owl vs no prompt 0.76 on these separately sampled sequences, versus 0.58 for birds and below 0.5 for animals and dogs).
 On text, and on Qwen numbers, there is little gradient: any animal-loving header, including dogs, separates the owl and eagle answers from the train-loving ones about as well as the specific header.
 So on text the dominant signal is closer to "loves an animal, rather than trains" (plausibly the enthusiastic voice, which owl, eagle and dog lovers share) than to anything owl-specific; the number sequences on Olmo are the one place where something specifically bird-shaped shows up.
 

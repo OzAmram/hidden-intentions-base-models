@@ -118,3 +118,25 @@
 - `scripts/mismatched_extra_cells.py` -> `results/mismatched_extra_cells.json`: owl - trains and owl - eagle header pairs for the heatmap, same estimator as table 3.9. Number-sequence cells use a different subset of sequences than the main text (412 of about 1,000 owl sequences shared); own-pair owl vs trains is 0.90 there, 0.96 in the main text.
 - Figures show k = 30 only, except the post-trained panels of `broader_headers`, which show per answer because they saturate at k = 30. Diagrams: "?" over the classifier, "Confused!", no k.
 - 2026-11-07: calibration appendix trimmed to two tables; the two transfer tests are summarized in text (full results in results/calibration_transfer.md, results/calibration_cross_comparison.md).
+
+## 2026-11-07: summary of the classifier fix and paper/post update (all committed and pushed, last commit d5f0641)
+
+**Goal:** fix the prompted-classifier baseline after another agent reported a GPT-4.1 readout bug, and update the paper, LessWrong post and write-ups to match. (The entries above from 2026-11-06 and 2026-11-07 marked "uncommitted" have since been committed and pushed.)
+
+**Bottom line.** The paper's main claim holds: on hidden intentions in text, PHLE beats both prompted classifiers by a wide margin, in both model families and for distilled students. Its old lead example does not: on owl vs eagle number sequences the corrected classifiers do about as well as PHLE (0.76-0.77 vs 0.84 at k = 30), so owl vs trains (0.96 vs 0.61-0.68) is now the example. PHLE's own numbers are unchanged.
+
+**What was wrong with the old baseline.** (1) The GPT-4.1 readout let token variants such as " B" overwrite "B", often flipping or zeroing the score. (2) Each answer was asked in one random A/B order, and the classifiers' letter preference (often several nats) swamped the signal. (3) Classifiers scored their own 300-answer samples, not PHLE's answers. (4) Hanley-McNeil error bars treated pooled bags from a fixed pool as independent.
+
+**What was done.**
+- Rerun: GPT-4.1 and local Olmo/Qwen Instruct classifiers in both A/B orders on exactly the answers PHLE scored, PHLE and classifiers on identical bags and bootstrap (`scripts/classifier_on_phle_answers.py`, `results/classifier_fixed/phle_answers.{md,json}`); easy-task control passes (overt cases AUC 1.00); confirmation on answers outside an earlier 300-answer run (owl vs eagle numbers: GPT-4.1 0.72 ± 0.07, PHLE 0.79 ± 0.06).
+- Six-way rerun with every hypothesis under every letter (`scripts/classifier_sixway.py`): classifiers stay at 0.17 in both families (they mostly pick "no prompt"); PHLE 0.58 (Olmo) and 0.71 (Qwen) at k = 30.
+- PHLE error-bar check (`scripts/check_phle_error_bars.py`): bootstrap errors are about right on average (split-half ratio 0.96 / 1.04 / 0.90 at k = 1 / 10 / 30), possibly 20-30% too small for owl vs no prompt and owl vs eagle on numbers at large k. Not mentioned in the paper (author's choice).
+- Paper: classifier numbers, method text, Figures 1-2 (classifier lane: "?" and "Confused!", owl vs trains example), footnote on the changed example, 12 appendix tables and 4 bar figures replaced by 5 figures, calibration appendix trimmed; review fixes (same-answers wording, Qwen sentence, markdown tables, README reproduction steps, diagram AUCs read from tables). arXiv tarball rebuilt (`paper/arxiv_submission.tar.gz`, 27 pages, builds standalone).
+- LessWrong post (`my_writeup_base_model_likelihoods.md`): synced from the published version first, then updated, with an "Update Nov 8" note at the top and a correction paragraph at the end; figures regenerated as `_v3` so LessWrong does not reuse cached images. Claude write-up and README updated to match.
+- Cost: about 29M GPT-4.1 input tokens (roughly $59 at the remembered price); about 1.5 GPU-hours on two short interactive allocations.
+
+**Open / next steps.**
+- Author: upload the new arXiv version and paste the updated post into LessWrong, both with a correction note.
+- PHLE numbers in the paper come from the original estimator, not the paired run, so they can differ from `phle_answers.json` by 0.01-0.03 (bag noise).
+- The rewording plot shows two odd PHLE results that were already in the old tables (Olmo owl vs no prompt numbers rising to 1.00 with reworded headers; Qwen "fascination" dropping to 0.45); not investigated, author not concerned.
+- The old "all k answers in one prompt" and ten-shot classifier results were not rerun and are no longer reported.
